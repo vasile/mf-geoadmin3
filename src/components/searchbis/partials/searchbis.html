@@ -1,0 +1,15 @@
+<div>
+  <input id="search-input" type="text" ng-model="selected" ng-change="inputValChange()"></input>
+  <ul class="dropdown-menu"
+    ng-show="isOpen()"
+    ng-style="{top: position.top+'px', left: position.left+'px', width: width+'px'}"
+    style="display: block;" role="listbox">
+    <li ng-repeat="match in matches track by $index"
+      ng-class="{active: isActive($index)}"
+      ng-mouseenter="selectActive($index)"
+      ng-mouseout="selectDeactive($index)"
+      ng-click="selectMatch($index)" role="option">
+        <div>{{match}}</div>
+    </li>
+  </ul>
+</div>
