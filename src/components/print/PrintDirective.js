@@ -581,11 +581,11 @@
       });
       if ($scope.options.graticule) {
         var graticule = {
-          'baseURL': 'http://wms.geo.admin.ch/',
-          'opacity': 1,
+          'baseURL': 'http://wms-bgdi.int.bgdi.ch/',
+          'opacity': 0.65,
           'singleTile': true,
           'type': 'WMS',
-          'layers': ['org.epsg.grid_21781,org.epsg.grid_4326'],
+          'layers': ['org.epsg.grid_21781', 'org.epsg.grid_4326'],
           'format': 'image/png',
           'styles': [''],
           'customParams': {
