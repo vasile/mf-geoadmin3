@@ -350,10 +350,9 @@
           var strokeColor = ol.color.asArray(textStyle.getStroke().getColor());
           literal.labelOutlineColor = toHexa(strokeColor);
           literal.labelOutlineWidth = textStyle.getStroke().getWidth();
-        }*/
+        } */
       }
-
-      return literal;
+      return literal; 
     };
 
     // Encoders by type of layer
@@ -426,7 +425,18 @@
             encFeatures.push(encJSON);
 
             if (styles && styles.length > 0) {
-              $.extend(encStyle, transformToPrintLiteral(feature, styles[0]));
+              var style =  styles[0];
+              var literal =  transformToPrintLiteral(feature, style);
+              $.extend(encStyle, literal);
+            }
+            if (style.getText()) {
+                var halo = angular.copy(encStyle);
+                halo.fontWeight = "bold";
+                halo.fontColor = "#ffffff";
+                halo.fontSize += 2;
+
+                encStyles[styleId] = halo;
+                styleId++;
             }
 
             encStyles[styleId] = encStyle;
