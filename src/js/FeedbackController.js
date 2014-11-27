@@ -18,6 +18,7 @@
                 $('#draw-popup h4').click();
               }, 0, false);
             } else {
+              $scope.globals.drawFromFeedback = true;
               $scope.globals.isDrawActive = true;
             }
           }

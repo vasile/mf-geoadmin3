@@ -43,16 +43,18 @@
     </div>
 
   </div>
-
-  <div ng-if="supportKmlExport">
-    <button class="btn btn-default pull-right"
-            ng-disabled="!canExport()"
-            ng-click="exportKml()"
-            translate>export_kml
-    </button>
-  </div>
-  <div class="pull-right" ng-if="!supportKmlExport" translate>
-    export_kml_notsupported
+  
+  <div ng-if="!fromFeedback">
+    <div ng-if="supportKmlExport">
+      <button class="btn btn-default pull-right"
+              ng-disabled="!canExport()"
+              ng-click="exportKml()"
+              translate>export_kml
+      </button>
+    </div>
+    <div class="pull-right" ng-if="!supportKmlExport" translate>
+      export_kml_notsupported
+    </div>
   </div>
 
 </div>

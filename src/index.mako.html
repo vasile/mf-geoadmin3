@@ -315,7 +315,9 @@ itemscope itemtype="http://schema.org/WebApplication"
                   </a>
                 </li>
                 <li><!-- Measure -->
-                  <a href=""  ng-click="globals.isMeasureActive = !globals.isMeasureActive;globals.isDrawActive = false;"
+                  <a href=""  ng-click="globals.isMeasureActive = !globals.isMeasureActive;
+                                        globals.isDrawActive = false;
+                                        globals.drawFromFeedback = false"
                      data-original-title="{{'measure_tooltip' | translate}}"
                      class="ga-custom-tooltip" data-placement="bottom"
                      accesskey="m">
@@ -323,7 +325,9 @@ itemscope itemtype="http://schema.org/WebApplication"
                   </a>
                 </li>
                 <li><!-- Draw -->
-                  <a href=""  ng-click="globals.isDrawActive = !globals.isDrawActive;globals.isMeasureActive = false;"
+                  <a href=""  ng-click="globals.isDrawActive = !globals.isDrawActive;
+                                        globals.isMeasureActive = false;
+                                        globals.drawFromFeedback = false"
                      data-original-title="{{'draw_tooltip' | translate}}"
                      class="ga-custom-tooltip" data-placement="bottom"
                      accesskey="r">
@@ -518,7 +522,8 @@ itemscope itemtype="http://schema.org/WebApplication"
         <div ga-draw 
              ga-draw-map="map" 
              ga-draw-options="options"
-             ga-draw-active="globals.isDrawActive"></div>
+             ga-draw-active="globals.isDrawActive"
+             ga-draw-from-feedback="globals.drawFromFeedback"></div>
       </div>
     </div><!-- end Draw -->
 % endif

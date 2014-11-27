@@ -19,7 +19,8 @@
         scope: {
           map: '=gaDrawMap',
           options: '=gaDrawOptions',
-          isActive: '=gaDrawActive'
+          isActive: '=gaDrawActive',
+          fromFeedback: '=gaDrawFromFeedback'
         },
         link: function(scope, element, attrs, controller) {
           var draw, deregister, lastActiveTool;
