@@ -197,6 +197,7 @@ prd/index.html: src/index.mako.html .build-artefacts/python-venv/bin/mako-render
 	mkdir -p $(dir $@)
 	${PYTHON_CMD} .build-artefacts/python-venv/bin/mako-render --var "device=desktop" --var "mode=prod" --var "version=$(VERSION)" --var "versionslashed=$(VERSION)/" --var "apache_base_path=$(APACHE_BASE_PATH)" --var "api_url=$(API_URL)" $< > $@
 	${PYTHON_CMD} .build-artefacts/python-venv/bin/htmlmin --remove-comments --keep-optional-attribute-quotes $@ $@
+	cp src/layersConfig prd
 
 prd/mobile.html: src/index.mako.html .build-artefacts/python-venv/bin/mako-render .build-artefacts/python-venv/bin/htmlmin .build-artefacts/last-api-url .build-artefacts/last-apache-base-path .build-artefacts/last-version
 	mkdir -p $(dir $@)
