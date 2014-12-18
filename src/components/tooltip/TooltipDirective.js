@@ -154,13 +154,13 @@
               return (olLayer instanceof ol.layer.Vector ||
                   (olLayer instanceof ol.layer.Image &&
                   olLayer.getSource() instanceof ol.source.ImageVector));
-            };
+            }
 
             // Test if the layer is a queryable bod layer
             function isQueryableBodLayer(olLayer) {
               return (olLayer.bodId &&
                   gaLayers.getLayerProperty(olLayer.bodId, 'queryable'));
-            };
+            }
 
             // Get all the queryable layers
             function getLayersToQuery() {
@@ -178,17 +178,23 @@
             function findVectorFeature(pixel, vectorLayer) {
               var featureFound;
               map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-                if (!vectorLayer || vectorLayer == layer) {
-                  if (!featureFound &&
-                      (feature.get('name') ||
-                      feature.get('description'))) {
-                    feature.set('layerId', layer.id);
+                if (layer) {
+                  if (!vectorLayer || vectorLayer == layer) {
+                    if (!featureFound &&
+                        (feature.get('name') ||
+                        feature.get('description'))) {
+                      feature.set('layerId', layer.id);
+                      featureFound = feature;
+                    }
+                  }
+                } else {
+                  if (feature) {
                     featureFound = feature;
                   }
                 }
               });
               return featureFound;
-            };
+            }
 
             // Find features for all type of layers
             function findFeatures(coordinate, size, mapExtent) {
