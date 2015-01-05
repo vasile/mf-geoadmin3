@@ -66,8 +66,19 @@
 
         // Where condition
         var where = (params.where) ? params.where + ' and ' : '';
-        where += filter.attribute.name + ' ' + filter.operator + ' ' +
-            filter.attribute.transformToLiteral(filter.value);
+        where += filter.attribute.name + ' ';
+
+        // Manage 'null' value
+        if (/^null$/i.test(filter.value)) {
+          where += 'is ';
+          if (/^(!=|<|>|not ilike)$/i.test(filter.operator)) {
+            where += 'not ';
+          }
+          where += 'null';
+        } else {
+          where += filter.operator + ' ' +
+              filter.attribute.transformToLiteral(filter.value);
+        }
         params.where = where;
       });
       return list;
