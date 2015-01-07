@@ -4,6 +4,7 @@
   var module = angular.module('ga_map_select_interactions_service', []);
 
   module.provider('gaMapSelectInteractions', function() {
+    // Ol bug https://github.com/openlayers/ol3/issues/2666
 
     this.$get = function() {
       var select,
