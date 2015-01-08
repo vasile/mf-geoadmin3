@@ -506,7 +506,7 @@
                 call(this, layer);
             var source = layer.getSource();
             var tileGrid = source.getTileGrid();
-            if (!config.background && layer.visible) {
+            if (!config.background && layer.visible && config.timeEnabled) {
               layersYears.push(layer.time);
             }
             angular.extend(enc, {
