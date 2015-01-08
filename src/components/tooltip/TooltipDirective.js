@@ -188,7 +188,15 @@
                     }
                   }
                 } else {
-                  if (feature) {
+                  // Mouse hover select (small hack)
+                  // Because not in the click select
+                  if (feature && vectorLayer) {
+                    var type = vectorLayer.get('type');
+                    if (type === 'geojson') {
+                      feature.set('layerId', vectorLayer.id);
+                      featureFound = feature;
+                    }
+                  } else if (feature) {
                     featureFound = feature;
                   }
                 }
@@ -268,10 +276,10 @@
 
                   if (value instanceof ol.Feature) {
                     var feature = new ol.Feature(value.getGeometry());
-                    feature.set('layerId', value.get('layerId'));
+                    var layerId = value.get('layerId');
+                    feature.set('layerId', layerId);
                     gaPreviewFeatures.add(map, feature);
                     showPopup(value.get('htmlpopup'));
-
                   } else {
                     //draw feature, but only if it should be drawn
                     if (gaLayers.getLayer(value.layerBodId) &&

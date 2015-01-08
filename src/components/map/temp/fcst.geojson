@@ -1,1 +1,432 @@
-{"features": [{"geometry": {"coordinates": [766280.0, 250360.0], "type": "Point"}, "id": "2473", "properties": {"name": "Diepoldsau, Rietbr\u00fccke - Rhein (2473)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [663790.0, 213575.0], "type": "Point"}, "id": "2634", "properties": {"name": "Emmen - Kleine Emme (2634)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [633730.0, 171510.0], "type": "Point"}, "id": "2457", "properties": {"name": "Ringgenberg, Goldswil - Aare (2457)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [627190.0, 267840.0], "type": "Point"}, "id": "2091", "properties": {"name": "Rheinfelden, Messstation - Rhein (2091)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [580680.0, 211650.0], "type": "Point"}, "id": "2085", "properties": {"name": "Hagneck - Aare (2085)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [682055.0, 249430.0], "type": "Point"}, "id": "2099", "properties": {"name": "Z\u00fcrich, Unterhard - Limmat (2099)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [600710.0, 198000.0], "type": "Point"}, "id": "2135", "properties": {"name": "Bern, Sch\u00f6nau - Aare (2135)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [690085.0, 193210.0], "type": "Point"}, "id": "2056", "properties": {"name": "Seedorf - Reuss (2056)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [608220.0, 223250.0], "type": "Point"}, "id": "2155", "properties": {"name": "Wiler, Limpachm\u00fcndung, nur Hauptstation - Emme (2155)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [682145.0, 246890.0], "type": "Point"}, "id": "2176", "properties": {"name": "Z\u00fcrich, Sihlh\u00f6lzli - Sihl (2176)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [662830.0, 252580.0], "type": "Point"}, "id": "2018", "properties": {"name": "Mellingen - Reuss (2018)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [665330.0, 211800.0], "type": "Point"}, "id": "2152", "properties": {"name": "Luzern, Geissmattbr\u00fccke - Reuss (2152)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [613230.0, 179280.0], "type": "Point"}, "id": "2030", "properties": {"name": "Thun - Aare (2030)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [657000.0, 259360.0], "type": "Point"}, "id": "2016", "properties": {"name": "Brugg - Aare (2016)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [665640.0, 258690.0], "type": "Point"}, "id": "2243", "properties": {"name": "Baden, Limmatpromenade - Limmat (2243)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [689145.0, 281975.0], "type": "Point"}, "id": "2288", "properties": {"name": "Neuhausen, Flurlingerbr\u00fccke - Rhein (2288)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [613400.0, 267650.0], "type": "Point"}, "id": "2289", "properties": {"name": "Basel, Rheinhalle - Rhein (2289)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [753890.0, 189370.0], "type": "Point"}, "id": "2602", "properties": {"name": "Domat/Ems - Rhein (2602)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [733560.0, 263180.0], "type": "Point"}, "id": "2181", "properties": {"name": "Halden - Thur (2181)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [693510.0, 272500.0], "type": "Point"}, "id": "2044", "properties": {"name": "Andelfingen - Thur (2044)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [623610.0, 200430.0], "type": "Point"}, "id": "2070", "properties": {"name": "Emmenmatt, nur Hauptstation - Emme (2070)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [667060.0, 269230.0], "type": "Point"}, "id": "2143", "properties": {"name": "Rekingen - Rhein (2143)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [629530.0, 235090.0], "type": "Point"}, "id": "2063", "properties": {"name": "Murgenthal - Aare (2063)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [588220.0, 219020.0], "type": "Point"}, "id": "2029", "properties": {"name": "Br\u00fcgg, Aegerten - Aare (2029)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}, {"geometry": {"coordinates": [725160.0, 221380.0], "type": "Point"}, "id": "2104", "properties": {"name": "Weesen, Bi\u00e4sche - Linth (2104)", "param": "runoff", "w-typ": "river"}, "type": "Feature"}], "mapname": "fcst", "timestamp": "2014-09-19T18:15", "type": "FeatureCollection"}
+{
+"features": [
+{
+"geometry": {
+"coordinates": [
+766280,
+250360
+],
+"type": "Point"
+},
+"id": "2473",
+"properties": {
+"name": "Diepoldsau, Rietbrücke - Rhein (2473)",
+"param": "runoff",
+"description": "<div>12341</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+663790,
+213575
+],
+"type": "Point"
+},
+"id": "2634",
+"properties": {
+"name": "Emmen - Kleine Emme (2634)",
+"param": "runoff",
+"description": "<div>5234651</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+633730,
+171510
+],
+"type": "Point"
+},
+"id": "2457",
+"properties": {
+"name": "Ringgenberg, Goldswil - Aare (2457)",
+"param": "runoff",
+"description": "<div>123131</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+627190,
+267840
+],
+"type": "Point"
+},
+"id": "2091",
+"properties": {
+"name": "Rheinfelden, Messstation - Rhein (2091)",
+"param": "runoff",
+"description": "<div>1</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+580680,
+211650
+],
+"type": "Point"
+},
+"id": "2085",
+"properties": {
+"name": "Hagneck - Aare (2085)",
+"param": "runoff",
+"description": "<div>1000</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+682055,
+249430
+],
+"type": "Point"
+},
+"id": "2099",
+"properties": {
+"name": "Zürich, Unterhard - Limmat (2099)",
+"param": "runoff",
+"description": "<div>1</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+600710,
+198000
+],
+"type": "Point"
+},
+"id": "2135",
+"properties": {
+"name": "Bern, Schönau - Aare (2135)",
+"param": "runoff",
+"description": "<div>01</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+690085,
+193210
+],
+"type": "Point"
+},
+"id": "2056",
+"properties": {
+"name": "Seedorf - Reuss (2056)",
+"param": "runoff",
+"description": "<div>177</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+608220,
+223250
+],
+"type": "Point"
+},
+"id": "2155",
+"properties": {
+"name": "Wiler, Limpachmündung, nur Hauptstation - Emme (2155)",
+"param": "runoff",
+"description": "<div>901</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+682145,
+246890
+],
+"type": "Point"
+},
+"id": "2176",
+"properties": {
+"name": "Zürich, Sihlhölzli - Sihl (2176)",
+"param": "runoff",
+"description": "<div>109</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+662830,
+252580
+],
+"type": "Point"
+},
+"id": "2018",
+"properties": {
+"name": "Mellingen - Reuss (2018)",
+"param": "runoff",
+"description": "<div>581</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+665330,
+211800
+],
+"type": "Point"
+},
+"id": "2152",
+"properties": {
+"name": "Luzern, Geissmattbrücke - Reuss (2152)",
+"param": "runoff",
+"description": "<div>15</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+613230,
+179280
+],
+"type": "Point"
+},
+"id": "2030",
+"properties": {
+"name": "Thun - Aare (2030)",
+"param": "runoff",
+"description": "<div>23</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+657000,
+259360
+],
+"type": "Point"
+},
+"id": "2016",
+"properties": {
+"name": "Brugg - Aare (2016)",
+"param": "runoff",
+"description": "<div>1123</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+665640,
+258690
+],
+"type": "Point"
+},
+"id": "2243",
+"properties": {
+"name": "Baden, Limmatpromenade - Limmat (2243)",
+"param": "runoff",
+"description": "<div>12134</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+689145,
+281975
+],
+"type": "Point"
+},
+"id": "2288",
+"properties": {
+"name": "Neuhausen, Flurlingerbrücke - Rhein (2288)",
+"param": "runoff",
+"description": "<div>1984</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+613400,
+267650
+],
+"type": "Point"
+},
+"id": "2289",
+"properties": {
+"name": "Basel, Rheinhalle - Rhein (2289)",
+"param": "runoff",
+"description": "<div>11212</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+753890,
+189370
+],
+"type": "Point"
+},
+"id": "2602",
+"properties": {
+"name": "Domat/Ems - Rhein (2602)",
+"param": "runoff",
+"description": "<div>12121</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+733560,
+263180
+],
+"type": "Point"
+},
+"id": "2181",
+"properties": {
+"name": "Halden - Thur (2181)",
+"param": "runoff",
+"description": "<div>11</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+693510,
+272500
+],
+"type": "Point"
+},
+"id": "2044",
+"properties": {
+"name": "Andelfingen - Thur (2044)",
+"param": "runoff",
+"description": "<div>187</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+623610,
+200430
+],
+"type": "Point"
+},
+"id": "2070",
+"properties": {
+"name": "Emmenmatt, nur Hauptstation - Emme (2070)",
+"param": "runoff",
+"description": "<div>72</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+667060,
+269230
+],
+"type": "Point"
+},
+"id": "2143",
+"properties": {
+"name": "Rekingen - Rhein (2143)",
+"param": "runoff",
+"description": "<div>121</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+629530,
+235090
+],
+"type": "Point"
+},
+"id": "2063",
+"properties": {
+"name": "Murgenthal - Aare (2063)",
+"param": "runoff",
+"description": "<div>212</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+588220,
+219020
+],
+"type": "Point"
+},
+"id": "2029",
+"properties": {
+"name": "Brügg, Aegerten - Aare (2029)",
+"param": "runoff",
+"description": "<div>12</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+},
+{
+"geometry": {
+"coordinates": [
+725160,
+221380
+],
+"type": "Point"
+},
+"id": "2104",
+"properties": {
+"name": "Weesen, Biäsche - Linth (2104)",
+"param": "runoff",
+"description": "<div>2</div>",
+"w-typ": "river"
+},
+"type": "Feature"
+}
+],
+"mapname": "fcst",
+"timestamp": "2014-09-19T18:15",
+"type": "FeatureCollection"
+}
