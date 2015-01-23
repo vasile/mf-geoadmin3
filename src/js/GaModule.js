@@ -18,6 +18,7 @@
   goog.require('ga_search');
   goog.require('ga_topic');
   goog.require('ga_timeselector');
+  goog.require('ga_timestamp_control');
   goog.require('ga_translation');
   goog.require('ga_feedback');
   goog.require('ga_geolocation');
@@ -78,6 +79,7 @@
     'ga_search',
     'ga_topic',
     'ga_timeselector',
+    'ga_timestamp_control',
     'ga_translation',
     'ga_feedback',
     'ga_layermanager',

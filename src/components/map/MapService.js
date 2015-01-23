@@ -154,6 +154,14 @@
               this.set('timestamps', val);
             }
           },
+          timestamp: {
+            get: function() {
+              return this.get('timestamp');
+            },
+            set: function(val) {
+              this.set('timestamp', val);
+            }
+          },
           time: {
             get: function() {
               if (this instanceof ol.layer.Layer) {
@@ -713,7 +721,8 @@
             hasLegend: false,
             type: 'geojson',
             timeEnabled: false,
-            queryable: false
+            queryable: false,
+            timestamp: '2014-09-19T18:15'
           };
           return layers;
         };
@@ -882,6 +891,7 @@
             olLayer.bodId = bodId;
             olLayer.label = layer.label;
             olLayer.type = layer.type;
+            olLayer.timestamp = layer.timestamp;
             olLayer.timeEnabled = layer.timeEnabled;
             olLayer.timestamps = layer.timestamps;
           }
