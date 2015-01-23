@@ -13,7 +13,7 @@
 "name": "Diepoldsau, Rietbrücke - Rhein (2473)",
 "param": "runoff",
 "description": "<div>12341</div>",
-"w-typ": "river"
+"w-typ": "lake"
 },
 "type": "Feature"
 },
@@ -64,7 +64,7 @@
 "name": "Rheinfelden, Messstation - Rhein (2091)",
 "param": "runoff",
 "description": "<div>1</div>",
-"w-typ": "river"
+"w-typ": "lake"
 },
 "type": "Feature"
 },
@@ -166,7 +166,7 @@
 "name": "Zürich, Sihlhölzli - Sihl (2176)",
 "param": "runoff",
 "description": "<div>109</div>",
-"w-typ": "river"
+"w-typ": "lake"
 },
 "type": "Feature"
 },

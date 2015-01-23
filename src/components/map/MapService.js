@@ -5,6 +5,7 @@
   goog.require('ga_networkstatus_service');
   goog.require('ga_offline_service');
   goog.require('ga_storage_service');
+  goog.require('ga_styles_from_literals_service');
   goog.require('ga_styles_service');
   goog.require('ga_urlutils_service');
 
@@ -14,6 +15,7 @@
     'ga_offline_service',
     'ga_map_select_interactions_service',
     'ga_storage_service',
+    'ga_styles_from_literals_service',
     'ga_styles_service',
     'ga_urlutils_service'
   ]);
@@ -646,7 +648,8 @@
 
     this.$get = function($http, $q, $rootScope, $translate, $window,
         gaBrowserSniffer, gaDefinePropertiesForLayer, gaMapUtils,
-        gaNetworkStatus, gaStorage, gaTileGrid, gaUrlUtils) {
+        gaNetworkStatus, gaStorage, gaTileGrid, gaUrlUtils,
+        gaStylesFromLiterals) {
 
       var Layers = function(wmtsGetTileUrlTemplate,
           layersConfigUrlTemplate, legendUrlTemplate) {
@@ -882,8 +885,15 @@
             var olSource = new ol.source.GeoJSON({
               url: layer.geojsonUrl
             });
+            var olStyleForVector = gaStylesFromLiterals();
             olLayer = new ol.layer.Vector({
-              source: olSource
+              source: olSource,
+              style: function(feature) {
+                var properties = feature.getProperties();
+                var key = olStyleForVector.key;
+                var property = properties[key];
+                return [olStyleForVector.get(property)];
+              }
             });
           }
           if (angular.isDefined(olLayer)) {
