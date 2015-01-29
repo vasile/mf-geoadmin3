@@ -725,7 +725,38 @@
             type: 'geojson',
             timeEnabled: false,
             queryable: false,
-            timestamp: '2014-09-19T18:15'
+            timestamp: '2014-09-19T18:15',
+            style:
+              {
+                'w-typ': {
+                  river: {
+                    image: {
+                      type: 'square',
+                      radius: 10,
+                      fill: {
+                        'color': 'rgba(255, 255, 255, 0.6)'
+                      },
+                      stroke: {
+                        color: '#319FD3',
+                        radius: 1
+                      }
+                    }
+                  },
+                  lake: {
+                    image: {
+                      type: 'circle',
+                      radius: 10,
+                      fill: {
+                        color: 'rgba(200, 200, 255, 0.6)'
+                      },
+                      stroke: {
+                        color: '#FFFFFF',
+                        radius: 3
+                      }
+                    }
+                  }
+                }
+              }
           };
           return layers;
         };
@@ -885,7 +916,7 @@
             var olSource = new ol.source.GeoJSON({
               url: layer.geojsonUrl
             });
-            var olStyleForVector = gaStylesFromLiterals();
+            var olStyleForVector = gaStylesFromLiterals(layer.style);
             olLayer = new ol.layer.Vector({
               source: olSource,
               style: function(feature) {

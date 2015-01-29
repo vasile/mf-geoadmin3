@@ -7,37 +7,6 @@
 
     this.$get = function() {
 
-      var properties = {
-        'w-typ': {
-          'river': {
-            'image': {
-              'type': 'square',
-              'radius': 10,
-              'fill': {
-                'color': 'rgba(255, 255, 255, 0.6)'
-              },
-              'stroke': {
-                'color': '#319FD3',
-                'radius': 1
-              }
-            }
-          },
-          'lake': {
-            'image': {
-              'type': 'circle',
-              'radius': 10,
-              'fill': {
-                'color': 'rgba(200, 200, 255, 0.6)'
-              },
-              'stroke': {
-                'color': '#FFFFFF',
-                'radius': 3
-              }
-            }
-          }
-        }
-      };
-
       function getOlRegularShape(options, shape) {
         var shapes = {
           square: {
@@ -97,7 +66,7 @@
         var property;
         var styles = {};
 
-        for (key in properties) {
+        for (var key in properties) {
           property = properties[key];
           this.key = key;
         }
@@ -115,12 +84,8 @@
         };
       }
 
-      // Properties should be fetched via a service
-      // The key should be part of the layer config
-      var temp = new olStyleForPropertyValue(properties);
-
-      return function(properties, type) {
-        return temp;
+      return function(properties) {
+        return new olStyleForPropertyValue(properties);
       };
     };
   });
