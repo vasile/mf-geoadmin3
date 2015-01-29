@@ -93,17 +93,20 @@
         return new ol.style.Style(olStyles);
       }
 
-      function olStyleForPropertyValue(properties, key) {
+      function olStyleForPropertyValue(properties) {
+        var property;
         var styles = {};
-        var property = properties[key];
+
+        for (key in properties) {
+          property = properties[key];
+          this.key = key;
+        }
 
         angular.forEach(property, function(value, k) {
           var propertyStyle = value;
           var olStyle = getOlStyleFromLiterals(propertyStyle);
           styles[k] = olStyle;
         });
-
-        this.key = key;
 
         this.styles = styles;
 
@@ -114,7 +117,7 @@
 
       // Properties should be fetched via a service
       // The key should be part of the layer config
-      var temp = new olStyleForPropertyValue(properties, 'w-typ');
+      var temp = new olStyleForPropertyValue(properties);
 
       return function(properties, type) {
         return temp;
