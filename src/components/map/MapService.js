@@ -1813,6 +1813,9 @@
             if (layers[i].preview && !(layers[i] instanceof ol.layer.Vector)) {
               map.removeLayer(layers[i]);
               i--;
+            } else if (layers[i].preview && layers[i].type == 'geojson') {
+              map.removeLayer(layers[i]);
+              i--;
             }
           }
         };
