@@ -7,23 +7,36 @@
 
     this.$get = function() {
 
+      function getOlIcon(options) {
+        return new ol.style.Icon({
+          src: options.src,
+          anchor: options.anchor ? options.anchor : [0.5, 0.5],
+          anchorXUnits: options.anchorXUnits ?
+              options.anchorXUnits : 'fraction',
+          anchorYUnits: options.anchorYUnits ?
+              options.anchorYUnits : 'fraction',
+          opacity: options.opacity ? options.opacity : 1
+        });
+      }
+
       function getOlRegularShape(options, shape) {
-        var shapes = {
-          square: {
-            fill: options.fill,
-            stroke: options.stroke,
-            points: 4,
-            radius: options.radius,
-            angle: Math.PI / 4
-          }
-        };
         if (shape === 'circle') {
           return new ol.style.Circle({
             radius: options.radius,
             fill: options.fill,
             stroke: options.stroke
           });
+        } else if (shape === 'icon') {
         } else {
+          var shapes = {
+            square: {
+              fill: options.fill,
+              stroke: options.stroke,
+              points: 4,
+              radius: options.radius,
+              angle: Math.PI / 4
+            }
+          };
           return new ol.style.RegularShape(shapes[shape]);
         }
       }
@@ -50,11 +63,15 @@
           var olStyle;
           var type = key;
           var style = value;
-          if (type == 'image') {
-            var options = getOlBasicStyles(style);
-            var shape = value.type;
-            options.radius = value.radius;
-            olStyles[type] = getOlRegularShape(options, shape);
+          if (type === 'image') {
+            if (value.type === 'icon') {
+              olStyle = getOlIcon(style);
+            } else {
+              var options = getOlBasicStyles(style);
+              options.radius = value.radius;
+              olStyle = getOlRegularShape(options, value.type);
+            }
+            olStyles[type] = olStyle;
           } else {
             olStyles[type] = getOlBasicStyles(style);
           }

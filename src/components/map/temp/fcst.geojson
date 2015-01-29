@@ -98,7 +98,7 @@
 "name": "Zürich, Unterhard - Limmat (2099)",
 "param": "runoff",
 "description": "<div>1</div>",
-"w-typ": "river"
+"w-typ": "pond"
 },
 "type": "Feature"
 },
@@ -421,7 +421,7 @@
 "name": "Weesen, Biäsche - Linth (2104)",
 "param": "runoff",
 "description": "<div>2</div>",
-"w-typ": "river"
+"w-typ": "pond"
 },
 "type": "Feature"
 }

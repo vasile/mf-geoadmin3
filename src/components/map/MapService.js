@@ -754,6 +754,14 @@
                         radius: 3
                       }
                     }
+                  },
+                  pond: {
+                    image: {
+                      type: 'icon',
+                      src: '//agilecrete.org/wp-content/uploads/' +
+                          'leaflet-maps-marker-icons/lake.png',
+                      anchor: [0.5, 1]
+                    }
                   }
                 }
               }
