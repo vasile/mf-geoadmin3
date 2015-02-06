@@ -17,6 +17,19 @@
             square: {
               points: 4,
               angle: Math.PI / 4
+            },
+            triangle: {
+              points: 3,
+              rotation: Math.PI / 4,
+              angle: 0
+            },
+            star: {
+              points: 5,
+              angle: 0
+            },
+            cross: {
+              points: 4,
+              angle: 0
             }
           };
           // {} to perserve the original object

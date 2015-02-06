@@ -319,7 +319,7 @@
 "name": "Halden - Thur (2181)",
 "param": "runoff",
 "description": "<div>11</div>",
-"w-typ": "river"
+"w-typ": "cherry"
 },
 "type": "Feature"
 },
@@ -370,7 +370,7 @@
 "name": "Rekingen - Rhein (2143)",
 "param": "runoff",
 "description": "<div>121</div>",
-"w-typ": "river"
+"w-typ": "cherry"
 },
 "type": "Feature"
 },
@@ -387,7 +387,7 @@
 "name": "Murgenthal - Aare (2063)",
 "param": "runoff",
 "description": "<div>212</div>",
-"w-typ": "river"
+"w-typ": "cherry"
 },
 "type": "Feature"
 },

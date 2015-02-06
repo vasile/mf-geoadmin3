@@ -739,7 +739,7 @@
                     },
                     stroke: {
                       color: '#319FD3',
-                      radius: 1
+                      width: 1
                     }
                   }
                 }, {
@@ -754,7 +754,7 @@
                     },
                     stroke: {
                       color: '#FFFFFF',
-                      radius: 3
+                      width: 3
                     }
                   }
                 }, {
@@ -765,6 +765,22 @@
                     src: 'http://openlayers.org/en/' +
                         'v3.1.1/examples/data/icon.png',
                     anchor: [0.5, 1]
+                  }
+                }, {
+                  type: 'point',
+                  value: 'cherry',
+                  vectorOptions: {
+                    type: 'star',
+                    radius: 10,
+                    radius2: 4,
+                    fill: {
+                      color: 'green',
+                      opacity: 0.5
+                    },
+                    stroke: {
+                      color: 'black',
+                      width: 1
+                    }
                   }
                 }
               ]
