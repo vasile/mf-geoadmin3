@@ -3,7 +3,6 @@
 
   goog.require('ga_debounce_service');
   goog.require('ga_layer_metadata_popup_service');
-  goog.require('ga_map_select_interactions_service');
   goog.require('ga_map_service');
   goog.require('ga_marker_overlay_service');
   goog.require('ga_permalink');
@@ -14,7 +13,6 @@
     'ga_debounce_service',
     'ga_layer_metadata_popup_service',
     'ga_map_service',
-    'ga_map_select_interactions_service',
     'ga_marker_overlay_service',
     'ga_permalink',
     'pascalprecht.translate',
@@ -27,7 +25,7 @@
           gaLayerMetadataPopup, gaMapUtils, gaPermalink, gaUrlUtils,
           gaGetCoordinate, gaBrowserSniffer, gaLayerFilters, gaKml,
           gaPreviewLayers, gaLayers, gaPreviewFeatures, gaMarkerOverlay,
-          gaSwisssearch, gaDebounce, gaMapSelectInteractions) {
+          gaSwisssearch, gaDebounce) {
         var currentTopic,
             footer = [
           '<div class="ga-search-footer clearfix">',
@@ -172,9 +170,6 @@
               if (!angular.isDefined(layerInMap)) {
                 var olLayer = gaLayers.getOlLayerById(bodId);
                 map.addLayer(olLayer);
-                if (olLayer.get('type') === 'geojson') {
-                  gaMapSelectInteractions.add(map, [olLayer]);
-                }
               }
             };
 

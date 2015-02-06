@@ -1,7 +1,6 @@
 (function() {
   goog.provide('ga_map_service');
 
-  goog.require('ga_map_select_interactions_service');
   goog.require('ga_networkstatus_service');
   goog.require('ga_offline_service');
   goog.require('ga_storage_service');
@@ -13,7 +12,6 @@
     'pascalprecht.translate',
     'ga_networkstatus_service',
     'ga_offline_service',
-    'ga_map_select_interactions_service',
     'ga_storage_service',
     'ga_styles_from_literals_service',
     'ga_styles_service',
@@ -934,6 +932,7 @@
             olLayer = new ol.layer.Vector({
               source: olSource,
               style: function(feature) {
+                feature.set('highlightable', true);
                 var properties = feature.getProperties();
                 var key = olStyleForVector.key;
                 var property = properties[key];
@@ -1250,8 +1249,7 @@
   module.provider('gaLayersPermalinkManager', function() {
 
     this.$get = function($rootScope, gaLayers, gaPermalink, $translate, $http,
-        gaKml, gaMapUtils, gaWms, gaLayerFilters, gaUrlUtils,
-        gaMapSelectInteractions) {
+        gaKml, gaMapUtils, gaWms, gaLayerFilters, gaUrlUtils) {
 
       var layersParamValue = gaPermalink.getParams().layers;
       var layersOpacityParamValue = gaPermalink.getParams().layers_opacity;
@@ -1448,9 +1446,6 @@
                   layer.time = timestamp;
                 }
                 map.addLayer(layer);
-                if (layer.get('type') === 'geojson') {
-                  gaMapSelectInteractions.add(map, [layer]);
-                }
               }
 
             } else if (allowThirdData && isKmlLayer(layerSpec)) {

@@ -5,18 +5,20 @@
   goog.require('ga_debounce_service');
   goog.require('ga_map_service');
   goog.require('ga_popup_service');
+  goog.require('ga_styles_service');
 
   var module = angular.module('ga_tooltip_directive', [
     'ga_debounce_service',
     'ga_popup_service',
     'ga_map_service',
+    'ga_styles_service',
     'pascalprecht.translate'
   ]);
 
   module.directive('gaTooltip',
       function($timeout, $http, $q, $translate, $sce, gaPopup, gaLayers,
           gaBrowserSniffer, gaDefinePropertiesForLayer, gaMapClick, gaDebounce,
-          gaPreviewFeatures) {
+          gaPreviewFeatures, gaStyleFactory, gaMapUtils) {
         var popupContent = '<div ng-repeat="htmlsnippet in options.htmls">' +
                             '<div ng-bind-html="htmlsnippet"></div>' +
                             '<div class="ga-tooltip-separator" ' +
@@ -31,6 +33,7 @@
           },
           link: function($scope, element, attrs) {
             var htmls = [],
+                highlightStyleCache = {},
                 onCloseCB = angular.noop,
                 map = $scope.map,
                 popup,
@@ -81,6 +84,7 @@
 
             // Change cursor style on mouse move, only on desktop
             var updateCursorStyle = function(evt) {
+              rollbackHoverStyle();
               var feature = findVectorFeature(map.getEventPixel(evt));
               map.getTarget().style.cursor = (feature) ? 'pointer' : '';
             };
@@ -174,10 +178,40 @@
               return layersToQuery;
             }
 
+            function rollbackHoverStyle() {
+              angular.forEach(highlightStyleCache, function(featureIds, bodId) {
+                var layer = gaMapUtils.getMapLayerForBodId(map, bodId);
+                for (var i = 0; i < featureIds.length; i++) {
+                  var featureId = featureIds[i];
+                  var feature = layer.getSource().getFeatureById(featureId);
+                  // Style is defined at the layer level
+                  feature.setStyle(null);
+                }
+              });
+              highlightStyleCache = {};
+            }
+
             // Find the first feature from a vector layer
             function findVectorFeature(pixel, vectorLayer) {
               var featureFound;
+
               map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                // Highlight vector features belonging to bod layers
+                // Keep track of highlighted features
+                if (feature && layer) {
+                  var bodId = layer.get('bodId');
+                  if (bodId && layer instanceof ol.layer.Vector) {
+                    var featureId = feature.getId();
+                    if (!highlightStyleCache.hasOwnProperty(bodId)) {
+                      highlightStyleCache[bodId] = [];
+                    }
+                    highlightStyleCache[bodId].push(featureId);
+                    feature.setStyle(gaStyleFactory.getStyle('highlight'));
+                  }
+                }
+
+                // vectorLayer is defined when a feature is clicked.
+                // onclick
                 if (layer) {
                   if (!vectorLayer || vectorLayer == layer) {
                     if (!featureFound &&
@@ -186,18 +220,6 @@
                       feature.set('layerId', layer.id);
                       featureFound = feature;
                     }
-                  }
-                } else {
-                  // Mouse hover select (small hack)
-                  // Because not in the click select
-                  if (feature && vectorLayer) {
-                    var type = vectorLayer.get('type');
-                    if (type === 'geojson') {
-                      feature.set('layerId', vectorLayer.id);
-                      featureFound = feature;
-                    }
-                  } else if (feature) {
-                    featureFound = feature;
                   }
                 }
               });

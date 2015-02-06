@@ -38,7 +38,6 @@
   goog.require('ga_collapsible_directive');
   goog.require('ga_fullscreen');
   goog.require('ga_waitcursor_service');
-  goog.require('ga_map_select_interactions_service');
   goog.require('ga_styles_from_literals_service');
 
   goog.require('ga_importkml_controller');
@@ -91,7 +90,6 @@
     'ga_profile',
     'ga_fullscreen',
     'ga_waitcursor_service',
-    'ga_map_select_interactions_service',
     'ga_styles_from_literals_service',
     'ga_seo',
     'ga_draw',

@@ -1,11 +1,9 @@
 (function() {
   goog.provide('ga_catalogtree_service');
 
-  goog.require('ga_map_select_interactions_service');
   goog.require('ga_map_service');
 
   var module = angular.module('ga_catalogtree_service', [
-    'ga_map_select_interactions_service',
     'ga_map_service'
   ]);
 
@@ -14,7 +12,7 @@
    * the catalog tree directives.
    */
   module.provider('gaCatalogtreeMapUtils', function() {
-    this.$get = function(gaLayers, gaMapSelectInteractions) {
+    this.$get = function(gaLayers) {
       return {
 
         /**
@@ -31,10 +29,6 @@
             var layer = gaLayers.getOlLayerById(item.layerBodId);
             if (angular.isDefined(layer)) {
               map.addLayer(layer);
-              // Add interaction on GeoJSON layers per default
-              if (layer.get('type') === 'geojson') {
-                gaMapSelectInteractions.add(map, [layer]);
-              }
             }
           }
         }

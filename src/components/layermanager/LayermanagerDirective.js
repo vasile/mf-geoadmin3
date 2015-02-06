@@ -2,13 +2,11 @@
   goog.provide('ga_layermanager_directive');
 
   goog.require('ga_layer_metadata_popup_service');
-  goog.require('ga_map_select_interactions_service');
   goog.require('ga_map_service');
 
   var module = angular.module('ga_layermanager_directive', [
     'pascalprecht.translate',
     'ga_layer_metadata_popup_service',
-    'ga_map_select_interactions_service',
     'ga_map_service'
   ]);
 
@@ -55,7 +53,7 @@
 
   module.directive('gaLayermanager', function($compile, $document, $timeout,
       $rootScope, $translate, $window, gaBrowserSniffer, gaLayerFilters,
-      gaLayerMetadataPopup, gaLayers, gaMapSelectInteractions) {
+      gaLayerMetadataPopup, gaLayers) {
 
     // Test if all layers have the same time property value.
     var hasLayersSameTime = function(olLayers) {
@@ -234,9 +232,6 @@
 
         scope.removeLayer = function(layer) {
           map.removeLayer(layer);
-          if (layer.get('type') === 'geojson') {
-            gaMapSelectInteractions.remove(map, [layer]);
-          }
         };
 
         scope.isBodLayer = function(layer) {

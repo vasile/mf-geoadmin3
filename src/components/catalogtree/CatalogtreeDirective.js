@@ -2,13 +2,11 @@
   goog.provide('ga_catalogtree_directive');
 
   goog.require('ga_catalogtree_service');
-  goog.require('ga_map_select_interactions_service');
   goog.require('ga_map_service');
   goog.require('ga_permalink');
 
   var module = angular.module('ga_catalogtree_directive', [
     'ga_catalogtree_service',
-    'ga_map_select_interactions_service',
     'ga_map_service',
     'ga_permalink',
     'pascalprecht.translate'
@@ -19,8 +17,7 @@
    */
   module.directive('gaCatalogtree',
       function($http, $q, $translate, $rootScope, gaPermalink, gaMapUtils,
-          gaCatalogtreeMapUtils, gaLayers, gaLayerFilters,
-          gaMapSelectInteractions) {
+          gaCatalogtreeMapUtils, gaLayers, gaLayerFilters) {
 
         return {
           restrict: 'A',
@@ -113,14 +110,8 @@
                         selectedLayers[i]);
                     if (angular.isDefined(mapLayer)) {
                       map.removeLayer(mapLayer);
-                      if (mapLayer.get('type') === 'geojson') {
-                        gaMapSelectInteractions.remove(map, [mapLayer]);
-                      }
                     }
                     map.addLayer(olLayer);
-                    if (olLayer.get('type') === 'geojson') {
-                      gaMapSelectInteractions.add(map, [olLayer]);
-                    }
                   }
                 }
               }
