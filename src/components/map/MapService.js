@@ -726,45 +726,51 @@
             timeEnabled: false,
             queryable: false,
             timestamp: '2014-09-19T18:15',
-            style:
-              {
-                'w-typ': {
-                  river: {
-                    image: {
-                      type: 'square',
-                      radius: 10,
-                      fill: {
-                        'color': 'rgba(255, 255, 255, 0.6)'
-                      },
-                      stroke: {
-                        color: '#319FD3',
-                        radius: 1
-                      }
-                    }
-                  },
-                  lake: {
-                    image: {
-                      type: 'circle',
-                      radius: 10,
-                      fill: {
-                        color: 'rgba(200, 200, 255, 0.6)'
-                      },
-                      stroke: {
-                        color: '#FFFFFF',
-                        radius: 3
-                      }
-                    }
-                  },
-                  pond: {
-                    image: {
-                      type: 'icon',
-                      src: '//agilecrete.org/wp-content/uploads/' +
-                          'leaflet-maps-marker-icons/lake.png',
-                      anchor: [0.5, 1]
+            style: {
+              type: 'unique',
+              property: 'w-typ',
+              values: [
+                {
+                  type: 'point',
+                  value: 'river',
+                  vectorOptions: {
+                    type: 'square',
+                    radius: 10,
+                    fill: {
+                      color: 'rgba(55, 53, 255, 0.6)'
+                    },
+                    stroke: {
+                      color: '#319FD3',
+                      radius: 1
                     }
                   }
+                }, {
+                  type: 'point',
+                  value: 'lake',
+                  vectorOptions: {
+                    type: 'circle',
+                    radius: 10,
+                    fill: {
+                      color: 'red',
+                      opacity: 0.4
+                    },
+                    stroke: {
+                      color: '#FFFFFF',
+                      radius: 3
+                    }
+                  }
+                }, {
+                  type: 'point',
+                  value: 'pond',
+                  vectorOptions: {
+                    type: 'icon',
+                    src: 'http://openlayers.org/en/' +
+                        'v3.1.1/examples/data/icon.png',
+                    anchor: [0.5, 1]
+                  }
                 }
-              }
+              ]
+            }
           };
           return layers;
         };
@@ -931,7 +937,17 @@
                 var properties = feature.getProperties();
                 var key = olStyleForVector.key;
                 var property = properties[key];
-                return [olStyleForVector.get(property)];
+                var geom = feature.getGeometry();
+                if (geom instanceof ol.geom.Point ||
+                    geom instanceof ol.geom.MultiPoint) {
+                  return [olStyleForVector.get('point', property)];
+                } else if (geom instanceof ol.geom.LineString ||
+                    geom instanceof ol.geom.MultiLineString) {
+                  return [olStyleForVector.get('line', property)];
+                } else if (geom instanceof ol.geom.Polygon ||
+                    geom instanceof ol.geom.MultiPolygon) {
+                  return [olStyleForVector.get('polygon', property)];
+                }
               }
             });
           }

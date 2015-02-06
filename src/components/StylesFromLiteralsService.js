@@ -7,37 +7,21 @@
 
     this.$get = function() {
 
-      function getOlIcon(options) {
-        return new ol.style.Icon({
-          src: options.src,
-          anchor: options.anchor ? options.anchor : [0.5, 0.5],
-          anchorXUnits: options.anchorXUnits ?
-              options.anchorXUnits : 'fraction',
-          anchorYUnits: options.anchorYUnits ?
-              options.anchorYUnits : 'fraction',
-          opacity: options.opacity ? options.opacity : 1
-        });
-      }
-
-      function getOlRegularShape(options, shape) {
+      function getOlStyleForPoint(options, shape) {
         if (shape === 'circle') {
-          return new ol.style.Circle({
-            radius: options.radius,
-            fill: options.fill,
-            stroke: options.stroke
-          });
+          return new ol.style.Circle(options);
         } else if (shape === 'icon') {
+          return new ol.style.Icon(options);
         } else {
           var shapes = {
             square: {
-              fill: options.fill,
-              stroke: options.stroke,
               points: 4,
-              radius: options.radius,
               angle: Math.PI / 4
             }
           };
-          return new ol.style.RegularShape(shapes[shape]);
+          // {} to perserve the original object
+          var style = angular.extend({}, shapes[shape], options);
+          return new ol.style.RegularShape(style);
         }
       }
 
@@ -57,47 +41,77 @@
         return olStyles;
       }
 
-      function getOlStyleFromLiterals(types) {
+      function getOlStyleFromLiterals(value) {
         var olStyles = {};
-        angular.forEach(types, function(value, key) {
+        var style = value.vectorOptions;
+        var geomType = value.type;
+        if (geomType === 'point') {
+            style = {
+              image: style
+            };
+        }
+
+        angular.forEach(style, function(value, key) {
           var olStyle;
-          var type = key;
-          var style = value;
-          if (type === 'image') {
-            if (value.type === 'icon') {
-              olStyle = getOlIcon(style);
-            } else {
-              var options = getOlBasicStyles(style);
-              options.radius = value.radius;
-              olStyle = getOlRegularShape(options, value.type);
-            }
-            olStyles[type] = olStyle;
+          if (key === 'image') {
+            var styleP = style[key];
+            var options = getOlBasicStyles(styleP);
+            // {} to preserve the original object
+            options = angular.extend({}, styleP, options);
+            olStyle = getOlStyleForPoint(options, value.type);
+            olStyles[key] = olStyle;
           } else {
-            olStyles[type] = getOlBasicStyles(style);
+            olStyles[key] = getOlBasicStyles(style);
           }
         });
+
         return new ol.style.Style(olStyles);
       }
 
       function olStyleForPropertyValue(properties) {
-        var property;
-        var styles = {};
+        var olStyle;
 
-        for (var key in properties) {
-          property = properties[key];
-          this.key = key;
+        this.singleStyle = null;
+
+        this.styles = {
+          point: {},
+          line: {},
+          polygon: {}
+        };
+
+        this.type = properties.type;
+
+        if (this.type === 'unique' || this.type === 'range') {
+            this.key = properties.property;
         }
 
-        angular.forEach(property, function(value, k) {
-          var propertyStyle = value;
-          var olStyle = getOlStyleFromLiterals(propertyStyle);
-          styles[k] = olStyle;
-        });
+        if (this.type === 'single') {
+          olStyle = getOlStyleFromLiterals(properties);
+          this.singleStyle = olStyle;
+        } else if (this.type === 'unique') {
+          var values = properties.values;
+          for (var i = 0; i < values.length; i++) {
+            var value = values[i];
+            olStyle = getOlStyleFromLiterals(value);
+            this.styles[value.type][value.value] = olStyle;
+          }
+        } else if (this.type === 'range') {
+          var ranges = properties.ranges;
+          for (var i = 0; i < ranges.length; i++) {
+            var range = ranges[i];
+            olStyle = getOlStyleFromLiterals(range);
+            // Accumulate ranges
+          }
+        }
 
-        this.styles = styles;
-
-        this.get = function(key) {
-          return this.styles[key];
+        this.get = function(geomType, value) {
+          if (this.type === 'single') {
+            return this.singleStyle;
+          } else if (this.type === 'unique') {
+            return this.styles[geomType][value];
+          } else if (this.type === 'range') {
+            return;
+          }
         };
       }
 
