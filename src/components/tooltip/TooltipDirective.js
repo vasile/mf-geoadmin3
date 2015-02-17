@@ -84,7 +84,9 @@
 
             // Change cursor style on mouse move, only on desktop
             var updateCursorStyle = function(evt) {
-              rollbackHoverStyle();
+              if (!$.isEmptyObject(highlightStyleCache)) {
+                rollbackHoverStyle();
+              }
               var feature = findVectorFeature(map.getEventPixel(evt));
               map.getTarget().style.cursor = (feature) ? 'pointer' : '';
             };
