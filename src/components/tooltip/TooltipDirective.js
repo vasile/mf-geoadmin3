@@ -255,10 +255,12 @@
                         [feature]);
                     // Iframe communication from inside out
                     if (top != window) {
-                      featureId = feature.getId();
-                      layerBodId = layerToQuery.get('bodId');
+                      var featureId = feature.getId();
+                      var layerBodId = layerToQuery.get('bodId');
                       if (featureId && layerBodId) {
-                        parent.postMessage(layerBodId + '#' + featureId, '*')
+                        window.parent.postMessage(
+                            layerBodId + '#' + featureId, '*'
+                        );
                       }
                     }
                   }
