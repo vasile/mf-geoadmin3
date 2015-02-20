@@ -22,10 +22,13 @@ AddOutputFilterByType DEFLATE application/json
 </IfModule>
 
 # Redirect no-slash target to slashed version
+RedirectMatch ^${apache_base_path}/src$ ${apache_base_path}/src/
 RedirectMatch ^${apache_base_path}$ ${apache_base_path}/
 
-Alias ${apache_base_path}/src ${apache_base_directory}/src
-Alias ${apache_base_path}/ ${apache_base_directory}/prd/
+AliasMatch ^${apache_base_path}/src/(?:(?:[a-zA-Z]+/)*)(components|img|js|lib|locales|style)/(.*)$ ${apache_base_directory}/src/$1/$2
+AliasMatch ^${apache_base_path}/src/(?:(?:[a-zA-Z]+/)*)(.*)$ ${apache_base_directory}/src/$1
+
+AliasMatch ^${apache_base_path}/(?:(?:[a-zA-Z]+/)*)(.*)$ ${apache_base_directory}/prd/$1
 
 # Cached resources
 RewriteRule ^${apache_base_path}/[0-9]+/(img|lib|style|locales)(.*) ${apache_base_directory}/prd/$1$2

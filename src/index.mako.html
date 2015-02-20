@@ -54,13 +54,13 @@ itemscope itemtype="http://schema.org/WebApplication"
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, minimal-ui"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-    <meta name="msapplication-TileImage" content="${versionslashed}img/touch-icon-bund-144x144.png"/>
+    <meta name="msapplication-TileImage" content="${apache_base_path}/${versionslashed}img/touch-icon-bund-144x144.png"/>
     <meta name="msapplication-TileColor" content="#ffffff"/>
     <link rel="dns-prefetch" href="${api_url}"/>
 
-    <link rel="apple-touch-icon" sizes="76x76" href="${versionslashed}img/touch-icon-bund-76x76.png"/>
-    <link rel="apple-touch-icon" sizes="120x120" href="${versionslashed}img/touch-icon-bund-120x120.png"/>
-    <link rel="apple-touch-icon" sizes="152x152" href="${versionslashed}img/touch-icon-bund-152x152.png"/>
+    <link rel="apple-touch-icon" sizes="76x76" href="${apache_base_path}/${versionslashed}img/touch-icon-bund-76x76.png"/>
+    <link rel="apple-touch-icon" sizes="120x120" href="${apache_base_path}/${versionslashed}img/touch-icon-bund-120x120.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="${apache_base_path}/${versionslashed}img/touch-icon-bund-152x152.png"/>
 
     <!-- Description is translated 'by hand' in the MainController -->
     <meta name="description" content="geo.admin.ch ist die Geoinformationsplattform der Schweizerischen Eidgenossenschaft. // geo.admin.ch est la plateforme de géoinformation de la Confédération suisse."/>
@@ -73,7 +73,7 @@ itemscope itemtype="http://schema.org/WebApplication"
     <meta property="og:description" content="geo.admin.ch ist die Geoinformationsplattform der Schweizerischen Eidgenossenschaft. // geo.admin.ch est la plateforme de géoinformation de la Confédération suisse."/>
     <meta property="og:type" content="WebApplication"/>
     <meta property="og:url" content="http://map.geo.admin.ch"/>
-    <meta property="og:image" content="${versionslashed}img/logo_geoportal.png"/>
+    <meta property="og:image" content="${apache_base_path}/${versionslashed}img/logo_geoportal.png"/>
 
     <!-- Twitter Card Infos -->
     <meta name="twitter:card" content="summary"/>
@@ -81,7 +81,7 @@ itemscope itemtype="http://schema.org/WebApplication"
     <meta name="twitter:creator" content="@swiss_geoportal"/>
     <meta name="twitter:title" content="geo.admin.ch"/>
     <meta name="twitter:description" content="geo.admin.ch ist die Geoinformationsplattform der Schweizerischen Eidgenossenschaft. // geo.admin.ch est la plateforme de géoinformation de la Confédération suisse."/>
-    <meta name="twitter:image" content="${versionslashed}img/logo_geoportal.png"/>
+    <meta name="twitter:image" content="${apache_base_path}/${versionslashed}img/logo_geoportal.png"/>
     <meta name="twitter:url" content="http://map.geo.admin.ch"/>
 
     <!-- Facebook Specific fb:admins and fb.appid -->
@@ -89,7 +89,7 @@ itemscope itemtype="http://schema.org/WebApplication"
     <!-- Google+ Specific Tags -->
     <meta itemprop="name" content="geo.admin.ch"/>
     <meta itemprop="description" content="geo.admin.ch ist die Geoinformationsplattform der Schweizerischen Eidgenossenschaft. // geo.admin.ch est la plateforme de géoinformation de la Confédération suisse."/>
-    <meta itemprop="image" content="${versionslashed}img/logo_geoportal.png"/>
+    <meta itemprop="image" content="${apache_base_path}/${versionslashed}img/logo_geoportal.png"/>
 
     <script>
       (function(){
@@ -125,8 +125,8 @@ itemscope itemtype="http://schema.org/WebApplication"
       })();
     </script>
     
-    <link href="${versionslashed}style/app.css" rel="stylesheet"/>
-    <link rel="shortcut icon" type="image/x-icon" href="${versionslashed}img/favicon.ico"/>
+    <link href="${apache_base_path}/${versionslashed}style/app.css" rel="stylesheet"/>
+    <link rel="shortcut icon" type="image/x-icon" href="${apache_base_path}/${versionslashed}img/favicon.ico"/>
   </head>
 
   <body class="{{topicId}}" 
@@ -155,7 +155,7 @@ itemscope itemtype="http://schema.org/WebApplication"
        }
        })();
       </script>
-      <script src="${versionslashed}lib/IE9Fixes.js"></script>
+      <script src="${apache_base_path}/${versionslashed}lib/IE9Fixes.js"></script>
       <script>
         IE9Fix.call(this);
       </script>
@@ -166,8 +166,8 @@ itemscope itemtype="http://schema.org/WebApplication"
     <div ng-cloak translate-cloak id="header" class="navbar navbar-fixed-top">
       <div id="logo" class="pull-left">
         <a ng-href="?topic={{topicId}}&lang={{langId}}">
-          <img ng-if="langId" ng-src="${versionslashed}img/logo.ch.{{langId}}.png" alt="big_logo" draggable="false"/>
-          <img src="${versionslashed}img/logo.ch.small.png" alt="small_logo" draggable="false"/>
+          <img ng-if="langId" ng-src="${apache_base_path}/${versionslashed}img/logo.ch.{{langId}}.png" alt="big_logo" draggable="false"/>
+          <img src="${apache_base_path}/${versionslashed}img/logo.ch.small.png" alt="small_logo" draggable="false"/>
         </a>
       </div>
       <div id="search-container" ng-controller="GaSearchController">
@@ -612,13 +612,13 @@ itemscope itemtype="http://schema.org/WebApplication"
 % endif
 
 % if mode == 'prod':
-    <script src="${versionslashed}lib/build.js"></script>
+    <script src="${apache_base_path}/${versionslashed}lib/build.js"></script>
     <!-- For <= IE9, we load it explicitely as XDomain does not support
          dynamic/lazy loading of javascript -->
     <!--![if IE]>
-    <script src="${versionslashed}lib/bootstrap-datetimepicker.min.js"></script>
-    <script src="${versionslashed}lib/d3-3.3.1.min.js"></script>
-    <script src="${versionslashed}lib/jQuery.XDomainRequest.js"></script>
+    <script src="${apache_base_path}/${versionslashed}lib/bootstrap-datetimepicker.min.js"></script>
+    <script src="${apache_base_path}/${versionslashed}lib/d3-3.3.1.min.js"></script>
+    <script src="${apache_base_path}/${versionslashed}lib/jQuery.XDomainRequest.js"></script>
     <![endif]-->
 % else:
     <!-- in source, we need to load it here because IE9 ignores it in
@@ -686,13 +686,12 @@ itemscope itemtype="http://schema.org/WebApplication"
       (function() {
         var module = angular.module('ga');
         var cacheAdd = '${version}' != '' ? '/' + '${version}' : '';
-        var pathname = location.pathname.replace(/(index.html)|(mobile.html)/g, '');
 
         module.constant('gaGlobalOptions', {
           mapUrl : location.origin + '${apache_base_path}',
+          resourceUrl: location.origin + '${apache_base_path}/${versionslashed}',
           apiUrl : location.protocol + '${api_url}',
           cachedApiUrl: location.protocol + '${api_url}' + cacheAdd,
-          resourceUrl: location.origin + pathname + '${versionslashed}',
           ogcproxyUrl : location.protocol + '${api_url}' + '/ogcproxy?url=',
           whitelist: [
             'http://www.kmlvalidator.org/validate.htm'
@@ -701,7 +700,7 @@ itemscope itemtype="http://schema.org/WebApplication"
 
         module.config(function($translateProvider, gaGlobalOptions) {
           $translateProvider.useStaticFilesLoader({
-            prefix: '${versionslashed}locales/',
+            prefix: '${apache_base_path}/${versionslashed}locales/',
             suffix: '.json'
           });
           $translateProvider.cloakClassName('ng-cloak');
