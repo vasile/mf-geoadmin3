@@ -707,8 +707,17 @@
 
         // TODO Remove me
         var addGeojsonLayer = function(layers) {
+          var basePath;
+          var origin = location.origin;
+          var pathname = location.pathname;
+
+          if (pathname !== '/') {
+            basePath = origin + '/' + pathname.split('/')[1];
+          } else {
+            basePath = origin;
+          }
           layers.fcst = {
-            geojsonUrl: 'components/map/temp/fcst.geojson',
+            geojsonUrl: basePath + '/src/components/map/temp/fcst.geojson',
             opacity: 1,
             attribution: 'OFEV',
             background: false,
