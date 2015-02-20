@@ -253,6 +253,14 @@
                     feature.set('htmlpopup', htmlpopup);
                     showFeatures(layerToQuery.getExtent(), size,
                         [feature]);
+                    // Iframe communication from inside out
+                    if (top != window) {
+                      featureId = feature.getId();
+                      layerBodId = layerToQuery.get('bodId');
+                      if (featureId && layerBodId) {
+                        parent.postMessage(layerBodId + '#' + featureId, '*')
+                      }
+                    }
                   }
                 } else { // queryable bod layers
                   var params = {
