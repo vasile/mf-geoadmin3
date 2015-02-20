@@ -65,7 +65,7 @@
         }
 
         angular.forEach(style, function(value, key) {
-          var olStyle;
+          var olStyle = {};
           if (key === 'image') {
             var styleP = style[key];
             var options = getOlBasicStyles(styleP);
@@ -74,10 +74,9 @@
             olStyle = getOlStyleForPoint(options, value.type);
             olStyles[key] = olStyle;
           } else {
-            olStyles[key] = getOlBasicStyles(style);
+            olStyles = angular.extend({}, olStyle, getOlBasicStyles(style));
           }
         });
-
         return new ol.style.Style(olStyles);
       }
 
