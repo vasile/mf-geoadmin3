@@ -30,6 +30,11 @@
           return decodeURIComponent(str).match(/:\/\/(.[^/]+)/)[1].toString();
         };
 
+        this.getPathName = function(str) {
+          return decodeURIComponent(str)
+                 .match(/https?:\/\/(.[^/]+)(.[^\?]*)/)[2].toString();
+        };
+
         this.append = function(url, paramString) {
           if (paramString) {
             var parts = (url + ' ').split(/[?&]/);

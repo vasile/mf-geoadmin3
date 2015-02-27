@@ -54,6 +54,7 @@
   goog.require('ga_seo_controller');
   goog.require('ga_timeselector_controller');
   goog.require('ga_tooltip_controller');
+  goog.require('ga_url_magic_controller');
   goog.require('ga_featuretree_controller');
   goog.require('ga_measure_controller');
   goog.require('ga_draw_controller');
@@ -113,6 +114,7 @@
     'ga_seo_controller',
     'ga_timeselector_controller',
     'ga_tooltip_controller',
+    'ga_url_magic_controller',
     'ga_featuretree_controller',
     'ga_measure_controller',
     'ga_draw_controller',
