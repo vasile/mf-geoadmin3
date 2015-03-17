@@ -725,7 +725,7 @@
         }
         var center = overlay.getPosition();
         var offset = 5 * resolution;
-        if (center) {
+        if (center && elt.hasClass('marker')) {
           var marker = {
             'type': 'Vector',
             'styles': {
