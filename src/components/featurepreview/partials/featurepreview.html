@@ -1,0 +1,15 @@
+<div class="container-fluid" ng-show="lubislayers.length">
+  <div class="row">
+    <div ng-if="previews.length == 0">No results yet</div>
+    <div ng-repeat="prev in previews" class="preview-element">
+      <a ng-href="{{prev.link}}" target="_blank">
+        <img ng-src="{{prev.preview}}" alt="quickview"
+          ng-mouseenter="highlight(prev.f)"
+          ng-mouseleave="clearHighlight()"
+        >
+      </a>
+      <div>{{prev.f.properties.bgdi_flugjahr}}</div>
+    </div>
+  </div>
+</div>
+

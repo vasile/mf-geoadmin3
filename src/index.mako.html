@@ -232,6 +232,12 @@ itemscope itemtype="http://schema.org/WebApplication"
 
 % if device != 'embed':
     <div ng-cloak translate-cloak id="footer" class="navbar navbar-fixed-bottom">
+  % if device == 'desktop':
+      <div id="feature-preview" ga-feature-preview
+                                ga-feature-preview-map="map">
+      </div>
+  %endif  
+
       <div  class="pull-left" ga-scale-line ga-scale-line-map="map"></div>
   % if device == 'desktop':
       <div id="mouseposition" class="pull-left hidden-xs" ng-controller="GaMousePositionController">

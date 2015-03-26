@@ -25,6 +25,7 @@
   goog.require('ga_layermanager');
   goog.require('ga_tooltip');
   goog.require('ga_swipe');
+  goog.require('ga_feature_preview');
   goog.require('ga_featuretree');
   goog.require('ga_measure');
   goog.require('ga_profile');
@@ -82,6 +83,7 @@
     'ga_layermanager',
     'ga_tooltip',
     'ga_swipe',
+    'ga_feature_preview',
     'ga_featuretree',
     'ga_measure',
     'ga_profile',
