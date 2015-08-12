@@ -40,6 +40,7 @@ goog.require('ga_permalink');
           });
           var layer = scene.imageryLayers.addImageryProvider(ip);
           layer.show = true;
+          window.ol3d = cesiumViewer;
           return cesiumViewer;
         };
 

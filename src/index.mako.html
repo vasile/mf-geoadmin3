@@ -666,6 +666,22 @@ itemscope itemtype="http://schema.org/WebApplication"
       goog.require('ga');
     </script>
 % endif
+    <script src="components/milktruck/milktruck.js"></script>
+    <script>
+      function milk() {
+        $(document.body).keydown(keyDown);
+        $(document.body).keyup(keyUp);
+        var scene = ol3d.getCesiumScene();
+        var truck = new Truck(scene);
+        Cesium.when(truck.model.readyPromise).then(function() {
+          truck.teleportTo(7.89086, 46.69947, 600);
+          scene.postRender.addEventListener(function() {
+            truck.tick();
+          });
+        });
+      }
+
+    </script>
 
 % if device == 'mobile':
     <script>
