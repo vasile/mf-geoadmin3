@@ -666,7 +666,34 @@ itemscope itemtype="http://schema.org/WebApplication"
       goog.require('ga');
     </script>
 % endif
+    <script src="components/fps/fps.js"></script>
+    <script>
+      function fps() {
+        var scene = ol3d.getCesiumScene();
+        var canvas = scene.canvas;
 
+        // FIXME: use a button
+        canvas.addEventListener('click', function(event) {
+          canvas.requestPointerLock();
+        });
+
+        var fps = new FPS(scene);
+
+        document.addEventListener('mousemove', fps.onMouseMove.bind(fps), false);
+        document.addEventListener('keydown', fps.onKey.bind(fps), false);
+        document.addEventListener('keyup', fps.onKey.bind(fps), false);
+
+        document.addEventListener('pointerlockchange', function(event) {
+          if (document.pointerLockElement) {
+            scene.screenSpaceCameraController.enableInputs = false;
+            scene.postRender.addEventListener(fps.tick, fps);
+          } else {
+            scene.screenSpaceCameraController.enableInputs = true;
+            scene.postRender.removeEventListener(fps.tick, fps);
+          }
+        });
+      };
+    </script>
 % if device == 'mobile':
     <script>
       window.addEventListener('load', function() {
