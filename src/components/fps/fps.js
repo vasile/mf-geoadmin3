@@ -4,6 +4,8 @@ function FPS(scene) {
 
   this.camera_ = scene.camera;
 
+  this.ellipsoid_ = scene.globe.ellipsoid;
+
   this.buttons_ = {
     forward: false,
     backward: false,
@@ -24,8 +26,11 @@ FPS.prototype.activate = function() {
 };
 
 FPS.prototype.deactivate = function() {
-
-
+  var lla = this.camera_.positionCartographic;
+  lla.height = 2000;
+  this.scene_.camera.flyTo({
+    destination: this.ellipsoid_.cartographicToCartesian(lla)
+  });
 };
 
 FPS.prototype.onMouseMove = function(event) {
@@ -80,8 +85,15 @@ FPS.prototype.tick = function() {
     this.camera_.moveBackward(moveAmount);
   }
 
+  var gpos = this.camera_.position;
+  var lla = this.ellipsoid_.cartesianToCartographic(gpos);
+  var groundAlt = Cesium.defaultValue(this.scene_.globe.getHeight(lla), 0.0);
+  lla.height = groundAlt + 2; // 2m above ground
+
+
   // FIXME: clamp camera to the ground
   this.camera_.setView({
+    positionCartographic: lla,
     heading: heading,
     pitch: pitch,
     roll : 0.0

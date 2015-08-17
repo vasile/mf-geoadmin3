@@ -690,6 +690,7 @@ itemscope itemtype="http://schema.org/WebApplication"
           } else {
             scene.screenSpaceCameraController.enableInputs = true;
             scene.postRender.removeEventListener(fps.tick, fps);
+            fps.deactivate();
           }
         });
       };
