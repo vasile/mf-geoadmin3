@@ -42,12 +42,38 @@ function FPS(scene) {
    * @private
    */
   this.canTick_ = false;
+
+  /**
+   * @private
+   */
+  this.previousTime_ = undefined;
+
+  /**
+   * In meters/second.
+   * @const
+   * @private
+   */
+  this.walkSpeed_ = 4 * 1000 / 3600;
+
+  /**
+   * In meters/second.
+   * @const
+   * @private
+   */
+  this.runSpeed_ = 10 * 1000 / 3600;
+
+  /**
+   * Number of meters above terrain.
+   * @const
+   * @private
+   */
+  this.heightAboveTerrain_ = 4;
 };
 
 
 FPS.prototype.activate = function() {
   var lla = this.camera_.positionCartographic;
-  lla.height = 2;
+  lla.height = this.heightAboveTerrain_;
   this.scene_.camera.flyTo({
     destination: this.ellipsoid_.cartographicToCartesian(lla),
     duration: 3,
@@ -71,7 +97,7 @@ FPS.prototype.deactivate = function() {
     destination: this.ellipsoid_.cartographicToCartesian(lla),
     orientation: {
       heading: this.scene_.camera.heading,
-      pitch: - 3 * Cesium.Math.PI / 8,
+      pitch: - Math.PI / 4, // with -PI/2 transition points to sky
       roll: 0
     }
   });
@@ -121,8 +147,18 @@ FPS.prototype.tick = function() {
     return;
   }
 
+  var now = new Date().getTime();
+  if (!this.previousTime_) {
+    this.previousTime_ = now;
+  }
+
+  var dt = now - this.previousTime_;
+  this.previousTime_ = now;
+
   // update camera position
-  var moveAmount = this.buttons_.shift ? 8.0 : 2.0;
+  // 50x faster than the pysical speed
+  var speed = this.buttons_.shift ? this.runSpeed_ : this.walkSpeed_;
+  var moveAmount = 50 * speed * dt / 1000;
   if (this.buttons_.left) {
     this.camera_.moveLeft(moveAmount);
   }
@@ -139,7 +175,7 @@ FPS.prototype.tick = function() {
   var gpos = this.camera_.position;
   var lla = this.ellipsoid_.cartesianToCartographic(gpos);
   var groundAlt = Cesium.defaultValue(this.scene_.globe.getHeight(lla), 0.0);
-  lla.height = groundAlt + 2; // 2m above ground
+  lla.height = groundAlt + this.heightAboveTerrain_;
 
 
   // FIXME: clamp camera to the ground
