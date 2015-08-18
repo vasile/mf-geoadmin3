@@ -38,20 +38,42 @@ function FPS(scene) {
    */
   this.movementY_ = 0;
 
+  /**
+   * @private
+   */
+  this.canTick_ = false;
 };
 
 
 FPS.prototype.activate = function() {
-
-
+  var lla = this.camera_.positionCartographic;
+  lla.height = 2;
+  this.scene_.camera.flyTo({
+    destination: this.ellipsoid_.cartographicToCartesian(lla),
+    duration: 3,
+    orientation: {
+      heading: this.scene_.camera.heading,
+      pitch: 0,
+      roll: 0
+    },
+    complete: function() {
+      this.canTick_ = true;
+    }.bind(this)
+  });
 };
 
 
 FPS.prototype.deactivate = function() {
   var lla = this.camera_.positionCartographic;
-  lla.height = 2000;
+  lla.height = 4000;
   this.scene_.camera.flyTo({
-    destination: this.ellipsoid_.cartographicToCartesian(lla)
+    duration: 3,
+    destination: this.ellipsoid_.cartographicToCartesian(lla),
+    orientation: {
+      heading: this.scene_.camera.heading,
+      pitch: - 3 * Cesium.Math.PI / 8,
+      roll: 0
+    }
   });
 };
 
@@ -94,6 +116,10 @@ FPS.prototype.tick = function() {
   pitch = Math.min(Math.PI / 4, pitch);
 
   this.movementY_ = 0;
+
+  if (!this.canTick_) {
+    return;
+  }
 
   // update camera position
   var moveAmount = this.buttons_.shift ? 8.0 : 2.0;
