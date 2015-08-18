@@ -1,11 +1,23 @@
 function FPS(scene) {
 
+  /**
+   * @private
+   */
   this.scene_ = scene;
 
+  /**
+   * @private
+   */
   this.camera_ = scene.camera;
 
+  /**
+   * @private
+   */
   this.ellipsoid_ = scene.globe.ellipsoid;
 
+  /**
+   * @private
+   */
   this.buttons_ = {
     forward: false,
     backward: false,
@@ -13,9 +25,15 @@ function FPS(scene) {
     right: false
   };
 
+  /**
+   * @private
+   */
   this.movementX_ = 0;
-  this.movementY_ = 0;
 
+  /**
+   * @private
+   */
+  this.movementY_ = 0;
 
 };
 
@@ -25,6 +43,7 @@ FPS.prototype.activate = function() {
 
 };
 
+
 FPS.prototype.deactivate = function() {
   var lla = this.camera_.positionCartographic;
   lla.height = 2000;
@@ -33,10 +52,12 @@ FPS.prototype.deactivate = function() {
   });
 };
 
+
 FPS.prototype.onMouseMove = function(event) {
   this.movementX_ += event.movementX;
   this.movementY_ += event.movementY;
 };
+
 
 FPS.prototype.onKey = function(event) {
   var pressed = event.type == 'keydown';
@@ -65,8 +86,8 @@ FPS.prototype.tick = function() {
   this.movementX_ = 0;
 
   pitch -= this.movementY_ * 0.025;
-  pitch = Math.max(-Math.PI / 2, pitch);
-  pitch = Math.min(Math.PI / 2, pitch);
+  pitch = Math.max(-Math.PI / 4, pitch);
+  pitch = Math.min(3 * Math.PI / 4, pitch);
 
   this.movementY_ = 0;
 
