@@ -1,3 +1,5 @@
+goog.provide('fps');
+
 function FPS(scene) {
 
   /**

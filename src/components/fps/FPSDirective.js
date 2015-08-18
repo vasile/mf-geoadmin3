@@ -1,5 +1,6 @@
 goog.provide('ga_fps_directive');
 
+goog.require('fps');
 goog.require('goog.asserts');
 (function() {
 
