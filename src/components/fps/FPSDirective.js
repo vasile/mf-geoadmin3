@@ -27,8 +27,8 @@ goog.require('goog.asserts');
         document.addEventListener('keydown', fps.onKey.bind(fps), false);
         document.addEventListener('keyup', fps.onKey.bind(fps), false);
 
-        document.addEventListener('pointerlockchange', function(event) {
-          if (document.pointerLockElement) {
+        var onPointerLockChange = function(event) {
+          if (document.pointerLockElement || document.mozPointerLockElement) {
             scene.screenSpaceCameraController.enableInputs = false;
             scene.postRender.addEventListener(fps.tick, fps);
             fps.activate();
@@ -37,10 +37,16 @@ goog.require('goog.asserts');
             scene.postRender.removeEventListener(fps.tick, fps);
             fps.deactivate();
           }
-        });
+        }
+        document.addEventListener('pointerlockchange', onPointerLockChange);
+        document.addEventListener('mozpointerlockchange', onPointerLockChange);
 
         scope.activate = function() {
-          canvas.requestPointerLock();
+          if (canvas.requestPointerLock) {
+            canvas.requestPointerLock();
+          } else if (canvas.mozRequestPointerLock) {
+            canvas.mozRequestPointerLock()
+          }
         };
 
       }
