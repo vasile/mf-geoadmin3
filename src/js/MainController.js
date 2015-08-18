@@ -92,8 +92,6 @@ goog.require('ga_storage_service');
       });
       var layer = scene.imageryLayers.addImageryProvider(ip);
       layer.show = true;
-      // FIXME: remove this
-      window.ol3d = cesiumViewer;
       return cesiumViewer;
     };
 

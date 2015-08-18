@@ -15,6 +15,7 @@ goog.require('ga_featuretree');
 goog.require('ga_featuretree_controller');
 goog.require('ga_feedback');
 goog.require('ga_feedback_controller');
+goog.require('ga_fps');
 goog.require('ga_fullscreen');
 goog.require('ga_geolocation');
 goog.require('ga_help');
@@ -60,6 +61,7 @@ goog.require('ga_waitcursor_service');
 
 
   var module = angular.module('ga', [
+    'ga_fps',
     'ga_attribution',
     'ga_catalogtree',
     'ga_contextpopup',
