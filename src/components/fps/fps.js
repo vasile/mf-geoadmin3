@@ -64,11 +64,24 @@ function FPS(scene) {
 
   /**
    * Number of meters above terrain.
-   * @const
    * @private
    */
   this.heightAboveTerrain_ = 4;
+
+  /**
+   * @private
+   */
+  this.plane_ = false;
 };
+
+FPS.prototype.setPlane = function(plane) {
+  this.plane_ = plane;
+  if (this.plane_) {
+    this.heightAboveTerrain_ = 400;
+  } else {
+    this.heightAboveTerrain_ = 4;
+  }
+}
 
 
 FPS.prototype.activate = function() {
@@ -125,6 +138,9 @@ FPS.prototype.onKey = function(event) {
   } else if (event.keyCode == 83 || event.keyCode == 40) {
     // S or Down.
     this.buttons_.backward = pressed;
+  } else if (event.keyCode == 70) {
+    // F
+    this.setPlane(!event.shiftKey);
   }
 };
 
@@ -134,6 +150,12 @@ FPS.prototype.tick = function() {
   var pitch = this.camera_.pitch;
 
   // update camera orientation
+  if (this.plane_) {
+    var angle = Cesium.Math.convertLongitudeRange(this.camera_.roll);
+    if (Math.abs(angle) > 0.25) {
+      this.movementX_ = angle / 4;
+    }
+  }
   heading += this.movementX_ * 0.025;
   this.movementX_ = 0;
 
@@ -160,12 +182,12 @@ FPS.prototype.tick = function() {
   var speed = this.buttons_.shift ? this.runSpeed_ : this.walkSpeed_;
   var moveAmount = 50 * speed * dt / 1000;
   if (this.buttons_.left) {
-    this.camera_.moveLeft(moveAmount);
+    this.plane_ ? this.camera_.twistLeft() : this.camera_.moveLeft(moveAmount);
   }
   if (this.buttons_.right) {
-    this.camera_.moveRight(moveAmount);
+    this.plane_ ? this.camera_.twistRight() : this.camera_.moveRight(moveAmount);
   }
-  if (this.buttons_.forward) {
+  if (this.buttons_.forward || this.plane_) {
     this.camera_.moveForward(moveAmount);
   }
   if (this.buttons_.backward) {
@@ -177,13 +199,11 @@ FPS.prototype.tick = function() {
   var groundAlt = Cesium.defaultValue(this.scene_.globe.getHeight(lla), 0.0);
   lla.height = groundAlt + this.heightAboveTerrain_;
 
-
   // FIXME: clamp camera to the ground
   this.camera_.setView({
     positionCartographic: lla,
     heading: heading,
-    pitch: pitch,
-    roll : 0.0
+    pitch: pitch
   });
 
 
