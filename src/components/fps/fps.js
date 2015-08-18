@@ -72,8 +72,13 @@ function FPS(scene) {
    * @private
    */
   this.plane_ = false;
-};
+}
 
+
+/**
+ * Set the mode.
+ * @param {boolean} plane
+ */
 FPS.prototype.setPlane = function(plane) {
   this.plane_ = plane;
   if (this.plane_) {
@@ -81,9 +86,12 @@ FPS.prototype.setPlane = function(plane) {
   } else {
     this.heightAboveTerrain_ = 4;
   }
-}
+};
 
 
+/**
+ * Activate.
+ */
 FPS.prototype.activate = function() {
   var lla = this.camera_.positionCartographic;
   lla.height = this.heightAboveTerrain_;
@@ -102,6 +110,9 @@ FPS.prototype.activate = function() {
 };
 
 
+/**
+ * Deactivate.
+ */
 FPS.prototype.deactivate = function() {
   var lla = this.camera_.positionCartographic;
   lla.height = 4000;
@@ -117,12 +128,22 @@ FPS.prototype.deactivate = function() {
 };
 
 
+/**
+ * MouseMove.
+ * @param {goog.events.Event} event
+ */
 FPS.prototype.onMouseMove = function(event) {
-  this.movementX_ += goog.isDef(event.movementX) ? event.movementX : event.mozMovementX;
-  this.movementY_ += goog.isDef(event.movementY) ? event.movementY : event.mozMovementY;
+  this.movementX_ += goog.isDef(event.movementX) ? event.movementX :
+      event.mozMovementX;
+  this.movementY_ += goog.isDef(event.movementY) ? event.movementY :
+      event.mozMovementY;
 };
 
 
+/**
+ * Handle key event.
+ * @param {goog.events.Event} event
+ */
 FPS.prototype.onKey = function(event) {
   var pressed = event.type == 'keydown';
   this.buttons_.shift = event.shiftKey;
@@ -145,6 +166,9 @@ FPS.prototype.onKey = function(event) {
 };
 
 
+/**
+ * Tick.
+ */
 FPS.prototype.tick = function() {
   var heading = this.camera_.heading;
   var pitch = this.camera_.pitch;
@@ -185,7 +209,8 @@ FPS.prototype.tick = function() {
     this.plane_ ? this.camera_.twistLeft() : this.camera_.moveLeft(moveAmount);
   }
   if (this.buttons_.right) {
-    this.plane_ ? this.camera_.twistRight() : this.camera_.moveRight(moveAmount);
+    this.plane_ ? this.camera_.twistRight() :
+        this.camera_.moveRight(moveAmount);
   }
   if (this.buttons_.forward || this.plane_) {
     this.camera_.moveForward(moveAmount);

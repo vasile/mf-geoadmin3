@@ -23,7 +23,8 @@ goog.require('goog.asserts');
 
         var fps = new FPS(scene);
 
-        document.addEventListener('mousemove', fps.onMouseMove.bind(fps), false);
+        document.addEventListener('mousemove', fps.onMouseMove.bind(fps),
+            false);
         document.addEventListener('keydown', fps.onKey.bind(fps), false);
         document.addEventListener('keyup', fps.onKey.bind(fps), false);
 
