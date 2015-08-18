@@ -37,7 +37,7 @@ goog.require('goog.asserts');
             scene.postRender.removeEventListener(fps.tick, fps);
             fps.deactivate();
           }
-        }
+        };
         document.addEventListener('pointerlockchange', onPointerLockChange);
         document.addEventListener('mozpointerlockchange', onPointerLockChange);
 
@@ -45,7 +45,7 @@ goog.require('goog.asserts');
           if (canvas.requestPointerLock) {
             canvas.requestPointerLock();
           } else if (canvas.mozRequestPointerLock) {
-            canvas.mozRequestPointerLock()
+            canvas.mozRequestPointerLock();
           }
         };
 

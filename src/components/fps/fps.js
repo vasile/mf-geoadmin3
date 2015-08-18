@@ -56,8 +56,8 @@ FPS.prototype.deactivate = function() {
 
 
 FPS.prototype.onMouseMove = function(event) {
-  this.movementX_ += event.movementX || event.mozMovementX;
-  this.movementY_ += event.movementY || event.mozMovementY;
+  this.movementX_ += goog.isDef(event.movementX) ? event.movementX : event.mozMovementX;
+  this.movementY_ += goog.isDef(event.movementY) ? event.movementY : event.mozMovementY;
 };
 
 
