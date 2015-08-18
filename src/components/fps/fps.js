@@ -21,6 +21,7 @@ function FPS(scene) {
    * @private
    */
   this.buttons_ = {
+    shift: false,
     forward: false,
     backward: false,
     left: false,
@@ -63,6 +64,7 @@ FPS.prototype.onMouseMove = function(event) {
 
 FPS.prototype.onKey = function(event) {
   var pressed = event.type == 'keydown';
+  this.buttons_.shift = event.shiftKey;
   if (event.keyCode == 65 || event.keyCode == 37) {
     // A or Left.
     this.buttons_.left = pressed;
@@ -89,12 +91,12 @@ FPS.prototype.tick = function() {
 
   pitch -= this.movementY_ * 0.025;
   pitch = Math.max(-Math.PI / 4, pitch);
-  pitch = Math.min(3 * Math.PI / 4, pitch);
+  pitch = Math.min(Math.PI / 4, pitch);
 
   this.movementY_ = 0;
 
   // update camera position
-  var moveAmount = 1.0;
+  var moveAmount = this.buttons_.shift ? 8.0 : 2.0;
   if (this.buttons_.left) {
     this.camera_.moveLeft(moveAmount);
   }
