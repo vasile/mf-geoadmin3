@@ -170,16 +170,115 @@ FPS.prototype.onKey = function(event) {
  * Tick.
  */
 FPS.prototype.tick = function() {
+  var dt = this.getTimeDifference_();
+  if (this.plane_) {
+    this.planeTick_(dt);
+  } else {
+    this.manTick_(dt);
+  }
+};
+
+
+/**
+ * Tick.
+ * @return {number}
+ * @private
+ */
+FPS.prototype.getTimeDifference_ = function() {
+  var now = new Date().getTime();
+  if (!this.previousTime_) {
+    this.previousTime_ = now;
+  }
+
+  var dt = now - this.previousTime_;
+  this.previousTime_ = now;
+  return dt;
+};
+
+
+/**
+ * Clamp a point above terrain
+ * @param {!Cesium.Cartesian3} gpos
+ * @param {number} minHeight
+ * @param {number=} opt_maxHeight
+ * @return {!Cesium.Cartesian3}
+ * @private
+ */
+FPS.prototype.clampAboveTerrain_ = function(gpos, minHeight, opt_maxHeight) {
+  var lla = this.ellipsoid_.cartesianToCartographic(gpos);
+  var groundAlt = Cesium.defaultValue(this.scene_.globe.getHeight(lla), 0.0);
+  if (lla.height - groundAlt < minHeight) {
+    lla.height = groundAlt + minHeight;
+  }
+  if (goog.isDef(opt_maxHeight) && (lla.height - groundAlt > opt_maxHeight)) {
+    lla.height = groundAlt + opt_maxHeight;
+  }
+  return this.ellipsoid_.cartographicToCartesian(lla);
+};
+
+
+/**
+ * Tick.
+ * @param {number} dt
+ * @private
+ */
+FPS.prototype.planeTick_ = function(dt) {
   var heading = this.camera_.heading;
   var pitch = this.camera_.pitch;
 
   // update camera orientation
-  if (this.plane_) {
-    var angle = Cesium.Math.convertLongitudeRange(this.camera_.roll);
-    if (Math.abs(angle) > 0.25) {
-      this.movementX_ = angle / 4;
-    }
+  var angleX = Cesium.Math.convertLongitudeRange(this.camera_.roll);
+  if (Math.abs(angleX) > 0.20) {
+    this.movementX_ = angleX / 4;
   }
+  heading += this.movementX_ * 0.025;
+  this.movementX_ = 0;
+
+  if (!this.canTick_) {
+    return;
+  }
+
+
+  // update camera position
+  // 50x faster than the pysical speed
+  var speed = this.buttons_.shift ? this.runSpeed_ : this.walkSpeed_;
+  var moveAmount = 50 * speed * dt / 1000;
+  if (this.buttons_.left) {
+    this.camera_.twistLeft();
+  }
+  if (this.buttons_.right) {
+    this.camera_.twistRight();
+  }
+  if (this.buttons_.forward) {
+    pitch = pitch - 0.02;
+  }
+  if (this.buttons_.backward) {
+    pitch = pitch + 0.02;
+  }
+
+  this.camera_.moveForward(moveAmount);
+
+  var gpos = this.camera_.position;
+  gpos = this.clampAboveTerrain_(gpos, 2);
+
+  this.camera_.setView({
+    position: gpos,
+    heading: heading,
+    pitch: pitch
+  });
+};
+
+
+/**
+ * Tick.
+ * @param {number} dt
+ * @private
+ */
+FPS.prototype.manTick_ = function(dt) {
+  var heading = this.camera_.heading;
+  var pitch = this.camera_.pitch;
+
+  // update camera orientation
   heading += this.movementX_ * 0.025;
   this.movementX_ = 0;
 
@@ -193,24 +292,15 @@ FPS.prototype.tick = function() {
     return;
   }
 
-  var now = new Date().getTime();
-  if (!this.previousTime_) {
-    this.previousTime_ = now;
-  }
-
-  var dt = now - this.previousTime_;
-  this.previousTime_ = now;
-
   // update camera position
   // 50x faster than the pysical speed
   var speed = this.buttons_.shift ? this.runSpeed_ : this.walkSpeed_;
   var moveAmount = 50 * speed * dt / 1000;
   if (this.buttons_.left) {
-    this.plane_ ? this.camera_.twistLeft() : this.camera_.moveLeft(moveAmount);
+    heading -= moveAmount * 0.025;
   }
   if (this.buttons_.right) {
-    this.plane_ ? this.camera_.twistRight() :
-        this.camera_.moveRight(moveAmount);
+    heading += moveAmount * 0.025;
   }
   if (this.buttons_.forward || this.plane_) {
     this.camera_.moveForward(moveAmount);
@@ -220,16 +310,11 @@ FPS.prototype.tick = function() {
   }
 
   var gpos = this.camera_.position;
-  var lla = this.ellipsoid_.cartesianToCartographic(gpos);
-  var groundAlt = Cesium.defaultValue(this.scene_.globe.getHeight(lla), 0.0);
-  lla.height = groundAlt + this.heightAboveTerrain_;
+  gpos = this.clampAboveTerrain_(gpos, 2, 2);
 
-  // FIXME: clamp camera to the ground
   this.camera_.setView({
-    positionCartographic: lla,
+    position: gpos,
     heading: heading,
     pitch: pitch
   });
-
-
 };
