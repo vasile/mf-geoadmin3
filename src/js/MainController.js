@@ -87,7 +87,7 @@ goog.require('ga_storage_service');
       });
       cesiumViewer.setEnabled(enabled);
       var terrainProvider = new Cesium.CesiumTerrainProvider({
-        url: 'https://3d.geo.admin.ch' +
+        url: 'https://3d.dev.bgdi.ch' +
           '/1.0.0/ch.swisstopo.terrain.3d/default/20151231/4326',
         credit: 'Swisstopo terrain'
       });
