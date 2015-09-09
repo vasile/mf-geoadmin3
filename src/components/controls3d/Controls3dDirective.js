@@ -44,12 +44,20 @@ goog.provide('ga_controls3d_directive');
           }
         };
 
+        scope.resetTilt = function() {
+
+        };
+
         scope.rotate = function(angle) {
           angle = Cesium.Math.toRadians(angle);
           var bottom = olcs.core.pickBottomPoint(scene);
           if (bottom) {
             olcs.core.setHeadingUsingBottomCenter(scene, angle, bottom);
           }
+        };
+
+        scope.resetRotation = function() {
+
         };
 
       }
