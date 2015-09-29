@@ -1,6 +1,6 @@
 // Ol3-Cesium. See https://github.com/openlayers/ol3-cesium/
 // License: https://github.com/openlayers/ol3-cesium/blob/master/LICENSE
-// Version: v1.8-20-gd8124ea
+// Version: v1.8-21-ge6f4d28
 
 var CLOSURE_NO_DEPS = true;
 // Copyright 2006 The Closure Library Authors. All Rights Reserved.
@@ -121293,6 +121293,12 @@ olcs.OLCesium = function(options) {
   this.scene_.globe = this.globe_;
   this.scene_.skyAtmosphere = new Cesium.SkyAtmosphere();
 
+  this.dataSourceCollection_ = new Cesium.DataSourceCollection();
+  this.dataSourceDisplay_ = new Cesium.DataSourceDisplay({
+    scene: this.scene_,
+    dataSourceCollection: this.dataSourceCollection_
+  });
+
   var synchronizers = goog.isDef(options.createSynchronizers) ?
       options.createSynchronizers(this.map_, this.scene_) :
       [
@@ -121318,7 +121324,8 @@ olcs.OLCesium = function(options) {
     if (!this.blockCesiumRendering_) {
       this.scene_.initializeFrame();
       this.handleResize_();
-      this.scene_.render();
+      var updated = this.dataSourceDisplay_.update(time);
+      this.scene_.render(time);
       this.enabled_ && this.camera_.checkCameraChange();
     }
     this.cesiumRenderingDelay_.start();
@@ -121372,6 +121379,14 @@ olcs.OLCesium.prototype.getOlMap = function() {
  */
 olcs.OLCesium.prototype.getCesiumScene = function() {
   return this.scene_;
+};
+
+/**
+ * @return {!Cesium.DataSourceCollection}
+ * @api
+ */
+olcs.OLCesium.prototype.getDataSources = function() {
+  return this.dataSourceCollection_;
 };
 
 
@@ -121828,6 +121843,11 @@ goog.exportProperty(
     olcs.OLCesium.prototype,
     'getCesiumScene',
     olcs.OLCesium.prototype.getCesiumScene);
+
+goog.exportProperty(
+    olcs.OLCesium.prototype,
+    'getDataSources',
+    olcs.OLCesium.prototype.getDataSources);
 
 goog.exportProperty(
     olcs.OLCesium.prototype,

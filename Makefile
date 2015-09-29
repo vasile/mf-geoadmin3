@@ -21,7 +21,7 @@ DEPLOY_ROOT_DIR := /var/www/vhosts/mf-geoadmin3/private/branch
 DEPLOY_TARGET ?= 'dev'
 LAST_DEPLOY_TARGET := $(shell if [ -f .build-artefacts/last-deploy-target ]; then cat .build-artefacts/last-deploy-target 2> /dev/null; else echo '-none-'; fi)
 OL3_VERSION ?= 4f45bbc05d3defd05fb691f7956d702cc4143c34
-OL3_CESIUM_VERSION ?= d8124ead6b83832bacc86c537d9d46245b127a7f
+OL3_CESIUM_VERSION ?= e6f4d2849bcdd692ae4c7212494e522f939454ab
 CESIUM_VERSION ?= fef3fac343140d7b83a323b6edf1cffd7ceb9cb5
 DEFAULT_TOPIC_ID ?= ech
 TRANSLATION_FALLBACK_CODE ?= de
@@ -578,7 +578,7 @@ scripts/00-$(GIT_BRANCH).conf: scripts/00-branch.mako-dot-conf \
 	git clone https://github.com/openlayers/ol3.git $@
 
 .build-artefacts/ol3-cesium:
-	git clone --recursive https://github.com/openlayers/ol3-cesium.git $@
+	git clone --recursive https://github.com/gjn/ol3-cesium.git $@
 
 .build-artefacts/bootstrap:
 	git clone https://github.com/twbs/bootstrap.git $@ && cd $@ && git checkout v3.3.1

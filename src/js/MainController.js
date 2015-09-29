@@ -107,6 +107,15 @@ goog.require('ga_topic_service');
       scene.globe.depthTestAgainstTerrain = true;
       scene.terrainProvider =
           gaLayers.getCesiumTerrainProviderById(gaGlobalOptions.defaultTerrain);
+
+      // Adding kml file per default
+      cesiumViewer.getDataSources().add(Cesium.KmlDataSource.load(
+            'https://api3.geo.admin.ch/ogcproxy?url=' +
+            'https%3A%2F%2Fdav0.bgdi.admin.ch%2Fbazl_web%2FActive_Obstacles.kmz'));
+            //'http%3A%2F%2F3dairspace.org.uk%2Fgoogle_earth%2Fdownloads%2Fsua%2Fswitzerland.kmz').
+            //https://dav0.bgdi.admin.ch/bazl_web/Active_Obstacles.kmz'));
+            //'http://3dairspace.org.uk/google_earth/downloads/sua/switzerland.kmz').
+            //'https://cesiumjs.org/Cesium/Apps/SampleData/kml/facilities/facilities.kml');
       return cesiumViewer;
     };
 
