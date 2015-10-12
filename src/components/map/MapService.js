@@ -1013,9 +1013,9 @@ goog.require('ga_urlutils_service');
               };
 
               // Terain
-              response.data['ch.swisstopo.terrain.3d'] = {
+              response.data['ch.swisstopo.terrain.3d_light'] = {
                 type: 'terrain',
-                serverLayerName: 'ch.swisstopo.terrain.3d',
+                serverLayerName: 'ch.swisstopo.terrain.3d_light',
                 timestamps: ['20151231'],
                 attribution: 'swisstopo 3D',
                 attributionUrl: 'http://www.swisstopo.admin.ch/internet/' +
@@ -1076,7 +1076,9 @@ goog.require('ga_urlutils_service');
           var requestedLayer = config3d.serverLayerName || bodId;
           if (config3d.type == 'terrain') {
             provider = new Cesium.CesiumTerrainProvider({
-              url: getTerrainTileUrl(requestedLayer, timestamp)
+              url: getTerrainTileUrl(requestedLayer, timestamp),
+              requestVertexNormals: true
+              //requestWaterMask: true
             });
             provider.bodId = bodId;
           }
