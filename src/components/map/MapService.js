@@ -1143,6 +1143,11 @@ goog.require('ga_urlutils_service');
           var olSource = (layer.timeEnabled) ? null : layer.olSource;
           if (layer.type == 'wmts') {
             if (!olSource) {
+              var opaque = false;
+              if (bodId == 'ch.swisstopo.swissimage-product') {
+                window.console.log('setting opaque to true');
+                opaque = true;
+              }
               olSource = layer.olSource = new ol.source.WMTS({
                 dimensions: {
                   'Time': timestamp
@@ -1154,7 +1159,8 @@ goog.require('ga_urlutils_service');
                 tileLoadFunction: tileLoadFunction,
                 url: getWmtsGetTileTpl(layer.url, layer.serverLayerName, null,
                   '21781', layer.format, true),
-                crossOrigin: crossOrigin
+                crossOrigin: crossOrigin,
+                opaque: opaque
               });
             }
             olLayer = new ol.layer.Tile({

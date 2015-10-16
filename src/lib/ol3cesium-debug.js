@@ -116496,6 +116496,7 @@ ol.source.WMTS = function(options) {
     attributions: options.attributions,
     crossOrigin: options.crossOrigin,
     logo: options.logo,
+    opaque: options.opaque,
     projection: options.projection,
     tileClass: options.tileClass,
     tileGrid: tileGrid,
