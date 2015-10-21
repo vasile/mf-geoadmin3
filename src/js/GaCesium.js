@@ -25,21 +25,18 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
   };
 
   // Building related code taken from original POC
-  // https://raw.githubusercontent.com/geoadmin/3d-testapp/198e5c3f5c5d22841d78183585874b4b5c85ddf4/poc.js?token=ACdAHY4w9qWFM6-g6ZISbNJWkhsLbEG7ks5WL2p0wA%3D%3D
   //// This is a very simplified loading strategy for building tiles
   var tileModelProvider = {
      add: function(swCorner, neCorner, gltf) {
+        swCorner[2] += 30;
+        neCorner[2] += 30;
         var rectangle = Cesium.Rectangle.fromCartographicArray([
           Cesium.Cartographic.fromDegrees.apply(null, swCorner),
           Cesium.Cartographic.fromDegrees.apply(null, neCorner)]
         );
-        var center = Cesium.Rectangle.center(rectangle);
-        center.height = Math.max(swCorner[2], neCorner[2]) + 1400;
-        var top = Cesium.Ellipsoid.WGS84.cartographicToCartesian(center);
         var tile = {
           rectangle: rectangle,
           southwest: Cesium.Cartesian3.fromDegrees.apply(null, swCorner),
-          top: top,
           loaded: false,
           gltf: 'https://mf-chsdi3.dev.bgdi.ch/ltjeg/files/buildings/' + gltf
         };
@@ -54,22 +51,26 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
         var pointed = scene.globe.pick(ray, scene);
         if (!Cesium.defined(pointed)) return;
 
-        var tile = [];
+        var tls = [];
         var bottom = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pointed);
         for (var i = 0; i < tiles.length; ++i) {
-          if (!Cesium.Rectangle.contains(tiles[i].rectangle, bottom)) continue;
-          tile.push(tiles[i]);
+          //if (Cesium.Rectangle.contains(tiles[i].rectangle, bottom)) {
+          //  tls.push(tiles[i]);
+          //}
+          tls.push(tiles[i]);
         }
-        tile.forEach(function(tile) {
+        tls.forEach(function(tile) {
           if (tile.loaded) {
             return;
           }
-          console.log('Loading model');
           var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
                                 tile.southwest);
           tile.model = scene.primitives.add(Cesium.Model.fromGltf({
-             url: tile.gltf,
-             modelMatrix: modelMatrix
+            url: tile.gltf,
+            modelMatrix: modelMatrix
+            //debugShowBoundingVolume: true,
+            //debugWireframe: true,
+            //allowPicking: true
           }));
           tile.loaded = true;
           tile.show = true;
