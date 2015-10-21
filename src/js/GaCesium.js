@@ -65,6 +65,7 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
     var camera = scene.camera;
     var bottom = olcs.core.pickBottomPoint(scene);
     var transform = Cesium.Matrix4.fromTranslation(bottom);
+
     if (enable) {
       // 2d -> 3d transition
       ol3d.setEnabled(true);
