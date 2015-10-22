@@ -16,13 +16,20 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
   var ol3CesiumLibUrl = gaGlobalOptions.resourceUrl + 'lib/ol3cesium.js';
   var cesiumLoaded = $q.defer();
   var cesiumClients = $q.defer();
-  var ol3d = undefined;
+  var ol3d;
   var rotateOnEnable = true;
 
   var intParam = function(name, defaultValue) {
     var params = gaPermalink.getParams();
     return parseInt(params[name] || defaultValue, 10);
   };
+
+  //var hackTileHeight = 500;
+  var hackTileHeight = 25;
+  var transform = Cesium.Transforms.eastNorthUpToFixedFrame;
+  //var transform = Cesium.Transforms.northEastDownToFixedFrame;
+  var gltfUrlPrefix = 'https://mf-chsdi3.dev.bgdi.ch/ltjeg/files/buildings/';
+  //var gltfUrlPrefix = 'https://mf-geoadmin3.dev.bgdi.ch/gberaudo/src/';
 
   // Building related code taken from original POC
   // https://raw.githubusercontent.com/geoadmin/3d-testapp/198e5c3f5c5d22841d78183585874b4b5c85ddf4/poc.js?token=ACdAHY4w9qWFM6-g6ZISbNJWkhsLbEG7ks5WL2p0wA%3D%3D
@@ -33,15 +40,26 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
           Cesium.Cartographic.fromDegrees.apply(null, swCorner),
           Cesium.Cartographic.fromDegrees.apply(null, neCorner)]
         );
-        var center = Cesium.Rectangle.center(rectangle);
-        center.height = Math.max(swCorner[2], neCorner[2]) + 1400;
-        var top = Cesium.Ellipsoid.WGS84.cartographicToCartesian(center);
+        ol3d.getCesiumScene().primitives.add(new Cesium.RectanglePrimitive({
+          rectangle: rectangle,
+          height: swCorner[2] + 0
+        }));
+        var bbs = new Cesium.BillboardCollection();
+        bbs.add({
+          position: Cesium.Cartesian3.fromDegrees.apply(null, swCorner.map(function(curr, idx) {
+            return idx !== 2 ? curr : curr + 30;
+          })),
+          image: 'img/marker.png'
+        });
+        ol3d.getCesiumScene().primitives.add(bbs);
+        // hack tile height up
+        swCorner[2] += hackTileHeight;
         var tile = {
           rectangle: rectangle,
           southwest: Cesium.Cartesian3.fromDegrees.apply(null, swCorner),
           top: top,
           loaded: false,
-          gltf: 'https://mf-chsdi3.dev.bgdi.ch/ltjeg/files/buildings/' + gltf
+          gltf: gltfUrlPrefix + gltf
         };
         this.tiles.push(tile);
         return this;
@@ -65,8 +83,7 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
             return;
           }
           console.log('Loading model');
-          var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-                                tile.southwest);
+          var modelMatrix = transform(tile.southwest);
           tile.model = scene.primitives.add(Cesium.Model.fromGltf({
              url: tile.gltf,
              modelMatrix: modelMatrix
@@ -90,8 +107,9 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
   };
 
   // Available tiles are added here
-  tileModelProvider
-  .add( // bern
+  var addTiles = function() {
+    tileModelProvider
+/*  .add( // bern
       [7.43818019986291, 46.9167638125432, 553.550877136178],
       [7.4653662804426, 46.9333388028237, 892.672429788858],
       'swissBUILDINGS3d.gltf')
@@ -103,11 +121,11 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
       [7.8142161084778, 46.6804275671058, 605.808860636316],
       [7.87238112753256, 46.7073213352311, 1461.69092196133],
       '1208-43_1208-43.gltf')
-  .add(
+*/  .add(
       [7.8712796027115, 46.6804421789384, 610.622131710872],
       [7.92885675463667, 46.7072134531994, 1346.55061065778],
       '1208-44_1208-44.gltf')
-  .add(
+/*  .add(
       [7.81419746559074, 46.6536001948296, 569.625796063803],
       [7.87167296424733, 46.6807611299416, 1453.67397088744],
       '1228-21_1228-21.gltf')
@@ -122,7 +140,8 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
   .add(
       [7.85529638642568, 46.6888939188272, 614.424975835718],
       [7.86755034897686, 46.6908704351679, 617.587541328743],
-      'ponts_Eis_cityGML.gltf');
+      'ponts_Eis_cityGML.gltf')*/;
+  };
 
 
 
@@ -133,9 +152,8 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
     var tileCacheSize = intParam('tileCacheSize', '100');
     var maximumScreenSpaceError = intParam('maximumScreenSpaceError', '2');
     window.minimumRetrievingLevel = intParam('minimumRetrievingLevel', '6');
-    var cesiumViewer;
     try {
-      cesiumViewer = new olcs.OLCesium({
+      ol3d = new olcs.OLCesium({
         map: map,
         createSynchronizers: function(map, scene) {
            return [
@@ -148,21 +166,22 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
       alert(e.message);
       return;
     }
-    var globe = cesiumViewer.getCesiumScene().globe;
+    var globe = ol3d.getCesiumScene().globe;
     globe.baseColor = Cesium.Color.WHITE;
     globe.tileCacheSize = tileCacheSize;
     globe.maximumScreenSpaceError = maximumScreenSpaceError;
-    var scene = cesiumViewer.getCesiumScene();
+    var scene = ol3d.getCesiumScene();
     scene.camera.frustum.far = frustumFar;
     scene.globe.depthTestAgainstTerrain = true;
     scene.screenSpaceCameraController.minimumZoomDistance = 50;
     scene.screenSpaceCameraController.maximumZoomDistance = 500000;
     scene.terrainProvider =
         gaLayers.getCesiumTerrainProviderById(gaGlobalOptions.defaultTerrain);
-    enableOl3d(cesiumViewer, enabled);
+    enableOl3d(ol3d, enabled);
 
+    addTiles();
     tileModelProvider.init(scene);
-    return cesiumViewer;
+    return ol3d;
   };
 
   var enableOl3d = function(ol3d, enable) {

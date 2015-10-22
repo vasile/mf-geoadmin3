@@ -1,6 +1,6 @@
 // Ol3-Cesium. See https://github.com/openlayers/ol3-cesium/
 // License: https://github.com/openlayers/ol3-cesium/blob/master/LICENSE
-// Version: v1.8-41-gd72857d
+// Version: v1.8-59-g10e5f32
 
 var CLOSURE_NO_DEPS = true;
 // Copyright 2006 The Closure Library Authors. All Rights Reserved.
@@ -118303,6 +118303,237 @@ olcs.AbstractSynchronizer.prototype.removeAllCesiumObjects =
 olcs.AbstractSynchronizer.prototype.createSingleLayerCounterparts =
     goog.abstractMethod;
 
+// Apache v2 license
+// https://github.com/TerriaJS/terriajs/blob/
+// ebd382a8278a817fce316730d9e459bbb9b829e9/lib/Models/Cesium.js
+
+goog.provide('olcs.AutoRenderLoop');
+
+
+
+/**
+ * @constructor
+ * @param {olcs.OLCesium} ol3d
+ * @param {boolean} debug
+ */
+olcs.AutoRenderLoop = function(ol3d, debug) {
+  this.ol3d = ol3d;
+  this.scene_ = ol3d.getCesiumScene();
+  this.verboseRendering = debug;
+  this._boundNotifyRepaintRequired = this.notifyRepaintRequired.bind(this);
+
+  this.lastCameraViewMatrix_ = new Cesium.Matrix4();
+  this.lastCameraMoveTime_ = 0;
+  this.stoppedRendering = false;
+
+  this._removePostRenderListener = this.scene_.postRender.addEventListener(
+      this.postRender.bind(this));
+
+
+  // Detect available wheel event
+  this._wheelEvent = '';
+  if ('onwheel' in this.scene_.canvas) {
+    // spec event type
+    this._wheelEvent = 'wheel';
+  } else if (!!document['onmousewheel']) {
+    // legacy event type
+    this._wheelEvent = 'mousewheel';
+  } else {
+    // older Firefox
+    this._wheelEvent = 'DOMMouseScroll';
+  }
+
+  this._originalLoadWithXhr = Cesium.loadWithXhr.load;
+  this._originalScheduleTask = Cesium.TaskProcessor.prototype.scheduleTask;
+
+  this.enable();
+};
+
+
+/**
+ * Force a repaint when the mouse moves or the window changes size.
+ * @param {string} key
+ * @param {boolean} capture
+ * @private
+ */
+olcs.AutoRenderLoop.prototype.repaintOn_ = function(key, capture) {
+  var canvas = this.scene_.canvas;
+  canvas.addEventListener(key, this._boundNotifyRepaintRequired, capture);
+};
+
+
+/**
+ * @param {string} key
+ * @param {boolean} capture
+ * @private
+ */
+olcs.AutoRenderLoop.prototype.removeRepaintOn_ = function(key, capture) {
+  var canvas = this.scene_.canvas;
+  canvas.removeEventListener(key, this._boundNotifyRepaintRequired, capture);
+};
+
+
+/**
+ * Enable.
+ */
+olcs.AutoRenderLoop.prototype.enable = function() {
+  this.repaintOn_('mousemove', false);
+  this.repaintOn_('mousedown', false);
+  this.repaintOn_('mouseup', false);
+  this.repaintOn_('touchstart', false);
+  this.repaintOn_('touchend', false);
+  this.repaintOn_('touchmove', false);
+
+  if (!!window['PointerEvent']) {
+    this.repaintOn_('pointerdown', false);
+    this.repaintOn_('pointerup', false);
+    this.repaintOn_('pointermove', false);
+  }
+
+  this.repaintOn_(this._wheelEvent, false);
+
+  window.addEventListener('resize', this._boundNotifyRepaintRequired, false);
+
+  // Hacky way to force a repaint when an async load request completes
+  var that = this;
+  Cesium.loadWithXhr.load = function(url, responseType, method, data,
+      headers, deferred, overrideMimeType, preferText, timeout) {
+    deferred['promise']['always'](that._boundNotifyRepaintRequired);
+    that._originalLoadWithXhr(url, responseType, method, data, headers,
+        deferred, overrideMimeType, preferText, timeout);
+  };
+
+  // Hacky way to force a repaint when a web worker sends something back.
+  Cesium.TaskProcessor.prototype.scheduleTask =
+      function(parameters, transferableObjects) {
+    var result = that._originalScheduleTask.call(this, parameters,
+        transferableObjects);
+
+    var taskProcessor = this;
+    if (!taskProcessor._originalWorkerMessageSinkRepaint) {
+      var worker = taskProcessor['_worker'];
+      taskProcessor._originalWorkerMessageSinkRepaint = worker.onmessage;
+      worker.onmessage = function(event) {
+        taskProcessor._originalWorkerMessageSinkRepaint(event);
+        that.notifyRepaintRequired();
+      };
+    }
+
+    return result;
+  };
+
+  // Listen for changes on the layer group
+  this.ol3d.getOlMap().getLayerGroup().on('change',
+      this._boundNotifyRepaintRequired);
+};
+
+
+/**
+ * Disable.
+ */
+olcs.AutoRenderLoop.prototype.disable = function() {
+  if (!!this._removePostRenderListener) {
+    this._removePostRenderListener();
+    this._removePostRenderListener = undefined;
+  }
+
+  this.removeRepaintOn_('mousemove', false);
+  this.removeRepaintOn_('mousedown', false);
+  this.removeRepaintOn_('mouseup', false);
+  this.removeRepaintOn_('touchstart', false);
+  this.removeRepaintOn_('touchend', false);
+  this.removeRepaintOn_('touchmove', false);
+
+  if (!!window['PointerEvent']) {
+    this.removeRepaintOn_('pointerdown', false);
+    this.removeRepaintOn_('pointerup', false);
+    this.removeRepaintOn_('pointermove', false);
+  }
+
+  this.removeRepaintOn_(this._wheelEvent, false);
+
+  window.removeEventListener('resize', this._boundNotifyRepaintRequired, false);
+
+  Cesium.loadWithXhr.load = this._originalLoadWithXhr;
+  Cesium.TaskProcessor.prototype.scheduleTask = this._originalScheduleTask;
+
+  this.ol3d.getOlMap().getLayerGroup().un('change',
+      this._boundNotifyRepaintRequired);
+};
+
+
+/**
+ * @param {number} date
+ */
+olcs.AutoRenderLoop.prototype.postRender = function(date) {
+  // We can safely stop rendering when:
+  //  - the camera position hasn't changed in over a second,
+  //  - there are no tiles waiting to load, and
+  //  - the clock is not animating
+  //  - there are no tweens in progress
+
+  var now = Date.now();
+
+  var scene = this.scene_;
+  var camera = scene.camera;
+
+  if (!Cesium.Matrix4.equalsEpsilon(this.lastCameraViewMatrix_,
+      camera.viewMatrix, 1e-5)) {
+    this.lastCameraMoveTime_ = now;
+  }
+
+  var cameraMovedInLastSecond = now - this.lastCameraMoveTime_ < 1000;
+
+  var surface = scene.globe['_surface'];
+  var tilesWaiting = !surface['_tileProvider'].ready ||
+      surface['_tileLoadQueue'].length > 0 ||
+      surface['_debug']['tilesWaitingForChildren'] > 0;
+
+  var tweens = scene['tweens'];
+  if (!cameraMovedInLastSecond && !tilesWaiting && tweens.length == 0) {
+    if (this.verboseRendering) {
+      console.log('stopping rendering @ ' + Date.now());
+    }
+    this.ol3d.setBlockCesiumRendering(true);
+    this.stoppedRendering = true;
+  }
+
+  Cesium.Matrix4.clone(camera.viewMatrix, this.lastCameraViewMatrix_);
+};
+
+
+/**
+ * Restart render loop.
+ * Force a restart of the render loop.
+ * @api
+ */
+olcs.AutoRenderLoop.prototype.restartRenderLoop = function() {
+  this.notifyRepaintRequired();
+};
+
+
+/**
+ * Notifies the viewer that a repaint is required.
+ */
+olcs.AutoRenderLoop.prototype.notifyRepaintRequired = function() {
+  if (this.verboseRendering && this.stoppedRendering) {
+    console.log('starting rendering @ ' + Date.now());
+  }
+  this._lastCameraMoveTime = Date.now();
+  // TODO: do not unblock if not blocked by us
+  this.ol3d.setBlockCesiumRendering(false);
+  this.stoppedRendering = false;
+};
+
+
+/**
+ * @param {boolean} debug
+ * @api
+ */
+olcs.AutoRenderLoop.prototype.setDebug = function(debug) {
+  this.verboseRendering = debug;
+};
+
 goog.provide('olcs.core.OLImageryProvider');
 
 goog.require('goog.events');
@@ -118943,8 +119174,8 @@ olcs.core.tileLayerToImageryLayer = function(olLayer, viewProj) {
 
 
 /**
- * Synchronizes the layer rendering properties (brightness, contrast, hue,
- * opacity, saturation, visible) to the given Cesium ImageryLayer.
+ * Synchronizes the layer rendering properties (opacity, visible)
+ * to the given Cesium ImageryLayer.
  * @param {!ol.layer.Base} olLayer
  * @param {!Cesium.ImageryLayer} csLayer
  * @api
@@ -118957,31 +119188,6 @@ olcs.core.updateCesiumLayerProperties = function(olLayer, csLayer) {
   var visible = olLayer.getVisible();
   if (goog.isDef(visible)) {
     csLayer.show = visible;
-  }
-
-  // saturation and contrast are working ok
-  var saturation = olLayer.getSaturation();
-  if (goog.isDef(saturation)) {
-    csLayer.saturation = saturation;
-  }
-  var contrast = olLayer.getContrast();
-  if (goog.isDef(contrast)) {
-    csLayer.contrast = contrast;
-  }
-
-  // Cesium actually operates in YIQ space -> hard to emulate
-  // The following values are only a rough approximations:
-
-  // The hue in Cesium has different meaning than the OL equivalent.
-  // var hue = olLayer.getHue();
-  // if (goog.isDef(hue)) {
-  //   csLayer.hue = hue;
-  // }
-
-  var brightness = olLayer.getBrightness();
-  if (goog.isDef(brightness)) {
-    // rough estimation
-    csLayer.brightness = Math.pow(1 + parseFloat(brightness), 2);
   }
 };
 
@@ -120939,9 +121145,7 @@ olcs.RasterSynchronizer.prototype.createSingleLayerCounterparts =
   var viewProj = this.view.getProjection();
   var cesiumObjects = this.convertLayerToCesiumImageries(olLayer, viewProj);
   if (!goog.isNull(cesiumObjects)) {
-    olLayer.on(
-        ['change:brightness', 'change:contrast', 'change:hue',
-         'change:opacity', 'change:saturation', 'change:visible'],
+    olLayer.on(['change:opacity', 'change:visible'],
         function(e) {
           // the compiler does not seem to be able to infer this
           goog.asserts.assert(!goog.isNull(cesiumObjects));
@@ -121129,6 +121333,8 @@ olcs.VectorSynchronizer.prototype.createSingleLayerCounterparts =
   var csPrimitives = counterpart.getRootPrimitive();
   var olListenKeys = counterpart.olListenKeys;
 
+  csPrimitives.show = olLayer.getVisible();
+
   olListenKeys.push(olLayer.on('change:visible', function(e) {
     csPrimitives.show = olLayer.getVisible();
   }));
@@ -121185,6 +121391,7 @@ goog.provide('olcs.OLCesium');
 
 goog.require('goog.async.AnimationDelay');
 goog.require('goog.dom');
+goog.require('olcs.AutoRenderLoop');
 goog.require('olcs.Camera');
 goog.require('olcs.RasterSynchronizer');
 goog.require('olcs.VectorSynchronizer');
@@ -121197,6 +121404,12 @@ goog.require('olcs.VectorSynchronizer');
  * @api
  */
 olcs.OLCesium = function(options) {
+
+  /**
+   * @type {olcs.AutoRenderLoop}
+   * @private
+   */
+  this.autoRenderLoop_ = null;
 
   /**
    * @type {!ol.Map}
@@ -121302,6 +121515,12 @@ olcs.OLCesium = function(options) {
   this.scene_.globe = this.globe_;
   this.scene_.skyAtmosphere = new Cesium.SkyAtmosphere();
 
+  this.dataSourceCollection_ = new Cesium.DataSourceCollection();
+  this.dataSourceDisplay_ = new Cesium.DataSourceDisplay({
+    scene: this.scene_,
+    dataSourceCollection: this.dataSourceCollection_
+  });
+
   var synchronizers = goog.isDef(options.createSynchronizers) ?
       options.createSynchronizers(this.map_, this.scene_) :
       [
@@ -121328,7 +121547,8 @@ olcs.OLCesium = function(options) {
     if (!this.blockCesiumRendering_) {
       this.scene_.initializeFrame();
       this.handleResize_();
-      this.scene_.render();
+      this.dataSourceDisplay_.update(time);
+      this.scene_.render(time);
       this.enabled_ && this.camera_.checkCameraChange();
     }
     this.cesiumRenderingDelay_.start();
@@ -121382,6 +121602,15 @@ olcs.OLCesium.prototype.getOlMap = function() {
  */
 olcs.OLCesium.prototype.getCesiumScene = function() {
   return this.scene_;
+};
+
+
+/**
+ * @return {!Cesium.DataSourceCollection}
+ * @api
+ */
+olcs.OLCesium.prototype.getDataSources = function() {
+  return this.dataSourceCollection_;
 };
 
 
@@ -121481,6 +121710,28 @@ olcs.OLCesium.prototype.setBlockCesiumRendering = function(block) {
   this.blockCesiumRendering_ = block;
 };
 
+
+/**
+ * Render the globe only when necessary in order to save resources.
+ * Experimental.
+ * @api
+ */
+olcs.OLCesium.prototype.enableAutoRenderLoop = function() {
+  if (!this.autoRenderLoop_) {
+    this.autoRenderLoop_ = new olcs.AutoRenderLoop(this, false);
+  }
+};
+
+
+/**
+ * Get the autorender loop.
+ * @return {?olcs.AutoRenderLoop}
+ * @api
+*/
+olcs.OLCesium.prototype.getAutoRenderLoop = function() {
+  return this.autoRenderLoop_;
+};
+
 goog.provide('ga.GaRasterSynchronizer');
 goog.require('olcs.RasterSynchronizer');
 
@@ -121564,6 +121815,7 @@ goog.addDependency('demos/editor/helloworlddialogplugin.js', ['goog.demos.editor
 
 goog.require('ga.GaRasterSynchronizer');
 goog.require('olcs.AbstractSynchronizer');
+goog.require('olcs.AutoRenderLoop');
 goog.require('olcs.Camera');
 goog.require('olcs.DragBox');
 goog.require('olcs.DragBoxEventType');
@@ -121582,6 +121834,16 @@ goog.exportProperty(
     olcs.AbstractSynchronizer.prototype,
     'synchronize',
     olcs.AbstractSynchronizer.prototype.synchronize);
+
+goog.exportProperty(
+    olcs.AutoRenderLoop.prototype,
+    'restartRenderLoop',
+    olcs.AutoRenderLoop.prototype.restartRenderLoop);
+
+goog.exportProperty(
+    olcs.AutoRenderLoop.prototype,
+    'setDebug',
+    olcs.AutoRenderLoop.prototype.setDebug);
 
 goog.exportSymbol(
     'olcs.Camera',
@@ -121834,6 +122096,11 @@ goog.exportProperty(
 
 goog.exportProperty(
     olcs.OLCesium.prototype,
+    'getDataSources',
+    olcs.OLCesium.prototype.getDataSources);
+
+goog.exportProperty(
+    olcs.OLCesium.prototype,
     'getEnabled',
     olcs.OLCesium.prototype.getEnabled);
 
@@ -121851,6 +122118,16 @@ goog.exportProperty(
     olcs.OLCesium.prototype,
     'setBlockCesiumRendering',
     olcs.OLCesium.prototype.setBlockCesiumRendering);
+
+goog.exportProperty(
+    olcs.OLCesium.prototype,
+    'enableAutoRenderLoop',
+    olcs.OLCesium.prototype.enableAutoRenderLoop);
+
+goog.exportProperty(
+    olcs.OLCesium.prototype,
+    'getAutoRenderLoop',
+    olcs.OLCesium.prototype.getAutoRenderLoop);
 
 goog.exportSymbol(
     'olcs.RasterSynchronizer',
