@@ -75,6 +75,11 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
         gaLayers.getCesiumTerrainProviderById(gaGlobalOptions.defaultTerrain);
     scene.postRender.addEventListener(limitCamera, scene);
     enableOl3d(cesiumViewer, enabled);
+    //scene.fog.enabled = false;
+    //scene.fog.density = 0.0000000000000000001;
+    window.scene = scene;
+    //scene.fog.screenSpaceErrorFactor = 20;
+    window.console.log(scene.fog);
     return cesiumViewer;
   };
 
