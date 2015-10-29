@@ -48,6 +48,7 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
            ];
         }
       });
+      cesiumViewer.enableAutoRenderLoop();
     } catch (e) {
       alert(e.message);
       return;

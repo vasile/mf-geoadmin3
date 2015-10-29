@@ -1,6 +1,6 @@
 // Ol3-Cesium. See https://github.com/openlayers/ol3-cesium/
 // License: https://github.com/openlayers/ol3-cesium/blob/master/LICENSE
-// Version: v1.9-6-gcd65a12
+// Version: v1.9-13-g11c0931
 
 var CLOSURE_NO_DEPS = true;
 // Copyright 2006 The Closure Library Authors. All Rights Reserved.
@@ -121175,6 +121175,7 @@ olcs.AutoRenderLoop = function(ol3d, debug) {
 
   this._originalLoadWithXhr = Cesium.loadWithXhr.load;
   this._originalScheduleTask = Cesium.TaskProcessor.prototype.scheduleTask;
+  this._originalCameraSetView = Cesium.Camera.prototype.setView;
 
   this.enable();
 };
@@ -121252,6 +121253,11 @@ olcs.AutoRenderLoop.prototype.enable = function() {
     return result;
   };
 
+  Cesium.Camera.prototype.setView = function() {
+    that._originalCameraSetView.apply(this, arguments);
+    that.notifyRepaintRequired();
+  };
+
   // Listen for changes on the layer group
   this.ol3d.getOlMap().getLayerGroup().on('change',
       this._boundNotifyRepaintRequired);
@@ -121286,6 +121292,7 @@ olcs.AutoRenderLoop.prototype.disable = function() {
 
   Cesium.loadWithXhr.load = this._originalLoadWithXhr;
   Cesium.TaskProcessor.prototype.scheduleTask = this._originalScheduleTask;
+  Cesium.Camera.prototype.setView = this._originalCameraSetView;
 
   this.ol3d.getOlMap().getLayerGroup().un('change',
       this._boundNotifyRepaintRequired);
@@ -122449,10 +122456,17 @@ olcs.Camera.prototype.updateCamera_ = function() {
     carto.height = goog.isDef(height) ? height : 0;
   }
 
-  this.cam_.setView({
-    positionCartographic: carto,
+  var destination = Cesium.Ellipsoid.WGS84.cartographicToCartesian(carto);
+
+  /** @type {Cesium.optionsOrientation} */
+  var orientation = {
     pitch: this.tilt_ - Cesium.Math.PI_OVER_TWO,
-    heading: -this.view_.getRotation()
+    heading: -this.view_.getRotation(),
+    roll: undefined
+  };
+  this.cam_.setView({
+    destination: destination,
+    orientation: orientation
   });
 
   this.cam_.moveBackward(this.distance_);
@@ -122983,7 +122997,7 @@ olcs.FeatureConverter.prototype.onRemoveOrClearFeature_ = function(evt) {
 
 
 /**
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature.
  * @param {!Cesium.Primitive|Cesium.Label|Cesium.Billboard} primitive
  * @protected
@@ -122998,7 +123012,7 @@ olcs.FeatureConverter.prototype.setReferenceForPicking =
 /**
  * Basics primitive creation using a color attribute.
  * Note that Cesium has 'interior' and outline geometries.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature.
  * @param {!ol.geom.Geometry} olGeometry Ol3 geometry.
  * @param {!Cesium.Geometry} geometry
@@ -123101,7 +123115,7 @@ olcs.FeatureConverter.prototype.extractLineWidthFromOlStyle =
 /**
  * Create a primitive collection out of two Cesium geometries.
  * Only the OpenLayers style colors will be used.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature.
  * @param {!ol.geom.Geometry} olGeometry Ol3 geometry.
  * @param {!Cesium.Geometry} fillGeometry
@@ -123138,7 +123152,7 @@ olcs.FeatureConverter.prototype.wrapFillAndOutlineGeometries =
 /**
  * Create a Cesium primitive if style has a text component.
  * Eventually return a PrimitiveCollection including current primitive.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.Geometry} geometry
  * @param {!ol.style.Style} style
@@ -123175,7 +123189,7 @@ olcs.FeatureConverter.prototype.addTextStyle =
  * Overriding this wrapper allows manipulating the billboard options.
  * @param {!Cesium.BillboardCollection} billboards
  * @param {!Cesium.optionsBillboardCollectionAdd} bbOptions
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature.
  * @param {!ol.geom.Geometry} geometry
  * @param {!ol.style.Style} style
@@ -123192,7 +123206,7 @@ olcs.FeatureConverter.prototype.csAddBillboard =
 
 /**
  * Convert an OpenLayers circle geometry to Cesium.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.Circle} olGeometry Ol3 circle geometry.
  * @param {!ol.proj.ProjectionLike} projection
@@ -123243,7 +123257,7 @@ olcs.FeatureConverter.prototype.olCircleGeometryToCesium =
 
 /**
  * Convert an OpenLayers line string geometry to Cesium.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.LineString} olGeometry Ol3 line string geometry.
  * @param {!ol.proj.ProjectionLike} projection
@@ -123289,7 +123303,7 @@ olcs.FeatureConverter.prototype.olLineStringGeometryToCesium =
 
 /**
  * Convert an OpenLayers polygon geometry to Cesium.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.Polygon} olGeometry Ol3 polygon geometry.
  * @param {!ol.proj.ProjectionLike} projection
@@ -123344,7 +123358,7 @@ olcs.FeatureConverter.prototype.olPolygonGeometryToCesium =
 
 
 /**
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.Geometry} geometry
  * @return {!Cesium.HeightReference}
@@ -123379,7 +123393,7 @@ olcs.FeatureConverter.prototype.getHeightReference =
 
 /**
  * Convert a point geometry to a Cesium BillboardCollection.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.Point} olGeometry Ol3 point geometry.
  * @param {!ol.proj.ProjectionLike} projection
@@ -123448,6 +123462,9 @@ olcs.FeatureConverter.prototype.olPointGeometryToCesium =
       // Cesium requires the image to be loaded
       var cancelled = false;
       var source = layer.getSource();
+      if (source instanceof ol.source.ImageVector) {
+        source = source.getSource();
+      }
       var canceller = function() {
         cancelled = true;
       };
@@ -123482,7 +123499,7 @@ olcs.FeatureConverter.prototype.olPointGeometryToCesium =
 
 /**
  * Convert an OpenLayers multi-something geometry to Cesium.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.Geometry} geometry Ol3 geometry.
  * @param {!ol.proj.ProjectionLike} projection
@@ -123548,7 +123565,7 @@ olcs.FeatureConverter.prototype.olMultiGeometryToCesium =
 
 /**
  * Convert an OpenLayers text style to Cesium.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature..
  * @param {!ol.geom.Geometry} geometry
  * @param {!ol.style.Text} style
@@ -123689,7 +123706,7 @@ olcs.FeatureConverter.prototype.olStyleToCesium =
 /**
  * Compute OpenLayers plain style.
  * Evaluates style function, blend arrays, get default style.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature
  * @param {ol.style.StyleFunction|undefined} fallbackStyle
  * @param {number} resolution
@@ -123723,7 +123740,7 @@ olcs.FeatureConverter.prototype.computePlainStyle =
 
 /**
  * Convert one OpenLayers feature up to a collection of Cesium primitives.
- * @param {ol.layer.Vector} layer
+ * @param {ol.layer.Vector|ol.layer.Image} layer
  * @param {!ol.Feature} feature Ol3 feature.
  * @param {!ol.style.Style} style
  * @param {!olcsx.core.OlFeatureToCesiumContext} context
@@ -123806,7 +123823,7 @@ olcs.FeatureConverter.prototype.olFeatureToCesium =
  * Convert an OpenLayers vector layer to Cesium primitive collection.
  * For each feature, the associated primitive will be stored in
  * `featurePrimitiveMap`.
- * @param {!ol.layer.Vector} olLayer
+ * @param {!(ol.layer.Vector|ol.layer.Image)} olLayer
  * @param {!ol.View} olView
  * @param {!Object.<number, !Cesium.Primitive>} featurePrimitiveMap
  * @return {!olcs.core.VectorLayerCounterpart}
@@ -123814,7 +123831,11 @@ olcs.FeatureConverter.prototype.olFeatureToCesium =
  */
 olcs.FeatureConverter.prototype.olVectorLayerToCesium =
     function(olLayer, olView, featurePrimitiveMap) {
-  var features = olLayer.getSource().getFeatures();
+  var source = olLayer.getSource();
+  if (source instanceof ol.source.ImageVector) {
+    source = source.getSource();
+  }
+  var features = source.getFeatures();
   var proj = olView.getProjection();
   var resolution = olView.getResolution();
 
@@ -123831,7 +123852,12 @@ olcs.FeatureConverter.prototype.olVectorLayerToCesium =
     if (!goog.isDefAndNotNull(feature)) {
       continue;
     }
-    var layerStyle = olLayer.getStyleFunction();
+    var layerStyle;
+    if (olLayer instanceof ol.layer.Image) {
+      layerStyle = olLayer.getSource().getStyleFunction();
+    } else {
+      layerStyle = olLayer.getStyleFunction();
+    }
     var style = this.computePlainStyle(olLayer, feature, layerStyle,
         resolution);
     if (!style) {
@@ -123850,7 +123876,7 @@ olcs.FeatureConverter.prototype.olVectorLayerToCesium =
 
 /**
  * Convert an OpenLayers feature to Cesium primitive collection.
- * @param {!ol.layer.Vector} layer
+ * @param {!(ol.layer.Vector|ol.layer.Image)} layer
  * @param {!ol.View} view
  * @param {!ol.Feature} feature
  * @param {!olcsx.core.OlFeatureToCesiumContext} context
@@ -123866,7 +123892,12 @@ olcs.FeatureConverter.prototype.convert =
     return null;
   }
 
-  var layerStyle = layer.getStyleFunction();
+  var layerStyle;
+  if (layer instanceof ol.layer.Image) {
+    layerStyle = layer.getSource().getStyleFunction();
+  } else {
+    layerStyle = layer.getStyleFunction();
+  }
   var style = this.computePlainStyle(layer, feature, layerStyle, resolution);
 
   if (!style) {
@@ -124150,14 +124181,21 @@ olcs.VectorSynchronizer.prototype.removeAllCesiumObjects = function(destroy) {
  */
 olcs.VectorSynchronizer.prototype.createSingleLayerCounterparts =
     function(olLayer) {
-  if (!(olLayer instanceof ol.layer.Vector)) {
+  if (!(olLayer instanceof ol.layer.Vector) &&
+      !(olLayer instanceof ol.layer.Image)) {
     return null;
   }
-  goog.asserts.assertInstanceof(olLayer, ol.layer.Vector);
+  goog.asserts.assertInstanceof(olLayer, ol.layer.Layer);
+
+  var source = olLayer.getSource();
+  if (olLayer.getSource() instanceof ol.source.ImageVector) {
+    source = olLayer.getSource().getSource();
+  }
+
+  goog.asserts.assertInstanceof(source, ol.source.Vector);
   goog.asserts.assert(!goog.isNull(this.view));
 
   var view = this.view;
-  var source = olLayer.getSource();
   var featurePrimitiveMap = {};
   var counterpart = this.converter.olVectorLayerToCesium(olLayer, view,
       featurePrimitiveMap);
@@ -124171,7 +124209,10 @@ olcs.VectorSynchronizer.prototype.createSingleLayerCounterparts =
   }));
 
   var onAddFeature = (function(feature) {
-    goog.asserts.assertInstanceof(olLayer, ol.layer.Vector);
+    goog.asserts.assert(
+        (olLayer instanceof ol.layer.Vector) ||
+        (olLayer instanceof ol.layer.Image)
+    );
     var context = counterpart.context;
     var prim = this.converter.convert(olLayer, view, feature, context);
     if (prim) {
