@@ -31,6 +31,15 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
     return parseInt(params[name] || defaultValue, 10);
   };
 
+  var boolParam = function(name, defaultValue) {
+    var params = gaPermalink.getParams();
+    var value = params[name];
+    if (value !== undefined) {
+      return value == 'true' || value == '1';
+    }
+    return defaultValue;
+  };
+
   // Create the cesium viewer with basic layers
   var initCesiumViewer = function(map, enabled) {
     var frustumFar = intParam('frustumFar', '500000000');
@@ -48,7 +57,9 @@ var GaCesium = function(map, gaPermalink, gaLayers, gaGlobalOptions, $q) {
            ];
         }
       });
-      cesiumViewer.enableAutoRenderLoop();
+      if (boolParam('autorender', true)) {
+        cesiumViewer.enableAutoRenderLoop();
+      }
     } catch (e) {
       alert(e.message);
       return;
