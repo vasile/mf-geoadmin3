@@ -173,8 +173,7 @@ goog.require('ga_urlutils_service');
             // https://github.com/openlayers/ol3/pull/2944)
             if (wmsVersion == '1.3.0' && projCode) {
               if (!canUseProj(layer, projCode)) {
-                layer.isInvalid = true;
-                layer.Abstract = 'layer_invalid_no_crs';
+                layer.useReprojection = true;
               } else {
                 projCode = undefined;
               }

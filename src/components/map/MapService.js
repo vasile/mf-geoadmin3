@@ -400,7 +400,8 @@ goog.require('ga_urlutils_service');
           var source = new ol.source.ImageWMS({
             params: params,
             url: options.url,
-            ratio: options.ratio || 1
+            ratio: options.ratio || 1,
+            projection: options.projection
           });
 
           var layer = new ol.layer.Image({
@@ -436,6 +437,9 @@ goog.require('ga_urlutils_service');
             label: getCapLayer.Title,
             extent: gaMapUtils.intersectWithDefaultExtent(getCapLayer.extent)
           };
+          if (getCapLayer.useReprojection) {
+            wmsOptions.projection = 'EPSG:4326';
+          }
           return createWmsLayer(wmsParams, wmsOptions);
         };
 
