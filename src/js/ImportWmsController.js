@@ -8,7 +8,15 @@ goog.provide('ga_importwms_controller');
       proxyUrl: gaGlobalOptions.ogcproxyUrl,
       defaultGetCapParams: 'SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0',
       defaultWMSList: [
-        'http://www.webatlasde.de/arcgis/services/Maps4BW/MapServer/WMSServer',
+        //eurosoil
+        'http://eusoils.jrc.ec.europa.eu/wrb/wms_Threats.asp?&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=PESERA&STYLES=&SRS=EPSG:3035&BBOX=1988372,1400000,6411627,5400000&FORMAT=image/png&WIDTH=1200&HEIGHT=900',
+        //eea
+        'http://discomap.eea.europa.eu/arcgis/services/Land/CLC2000_Dyna_WM/MapServer/WMSServer',
+        //OSM:
+        'http://irs.gis-lab.info/',
+        'http://ows.terrestris.de/osm/service?',
+        'http://ows.terrestris.de/osm-gray/service?',
+        //BadenWürtemberg
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/GDI/DE-BW-LST_INSPIRE_Viewservice_Strassennetz/MapServer/WMSServer',
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000033500001/MapServer/WMSServer',
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000017900001/MapServer/WMSServer',
@@ -23,7 +31,10 @@ goog.provide('ga_importwms_controller');
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000013100001/MapServer/WMSServer',
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000001500003/MapServer/WMSServer',
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000004200001/MapServer/WMSServer',
-        //until here test links
+
+        'http://www.webatlasde.de/arcgis/services/Maps4BW/MapServer/WMSServer',
+
+        //until here test urls
         'https://wms.geo.admin.ch/',
         'http://ogc.heig-vd.ch/mapserver/wms',
         'http://owsproxy.lgl-bw.de/owsproxy/ows/WMS_Maps4BW',
