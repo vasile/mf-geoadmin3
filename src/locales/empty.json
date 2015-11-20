@@ -375,5 +375,12 @@
   "geoloc_permission_denied": "",
   "geoloc_pos_unavailable": "",
   "geoloc_time_out": "",
-  "geoloc_unknown": ""
+  "geoloc_unknown": "",
+  "shop_order": "",
+  "mapsheet": "",
+  "commune": "",
+  "district": "",
+  "rectangle": "",
+  "whole": "",
+  "query_alert_more_than_200_results": ""
 }

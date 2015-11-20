@@ -1,0 +1,7 @@
+<button ng-if="orderTypes.length == 1" class="btn btn-default"
+        ng-click="orderMapsheet()" translate>shop_order</button>
+<select ng-if="orderTypes.length > 1"
+        ng-model="orderType"
+        ng-options="label for label in orderTypes"
+        ng-change="chooseOrderType(this)">
+</select>
