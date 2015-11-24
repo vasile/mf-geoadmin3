@@ -8,12 +8,22 @@ goog.provide('ga_importwms_controller');
       proxyUrl: gaGlobalOptions.ogcproxyUrl,
       defaultGetCapParams: 'SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0',
       defaultWMSList: [
+        //EUMETSAT realtime satellite products
+        'http://eumetview.eumetsat.int/geoserver/wms',
+        //Geology
+        'http://wms.ga.admin.ch/1GE',
+        'http://wms.ga.admin.ch/LG_DE_Geologie_und_Tektonik/wms',
+        //Regular WMS
+        'http://osm.omniscale.net/proxy/service',
+        'http://vmap0.tiles.osgeo.org/wms/vmap0',
+        'http://wms.lizardtech.com/lizardtech/iserv/ows',
+        'http://demo.mapserver.org/cgi-bin/wms',
         //eurosoil
-        'http://eusoils.jrc.ec.europa.eu/wrb/wms_Threats.asp?&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=PESERA&STYLES=&SRS=EPSG:3035&BBOX=1988372,1400000,6411627,5400000&FORMAT=image/png&WIDTH=1200&HEIGHT=900',
+        'http://eusoils.jrc.ec.europa.eu/wrb/wms_Threats.asp?&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap',
         //eea
         'http://discomap.eea.europa.eu/arcgis/services/Land/CLC2000_Dyna_WM/MapServer/WMSServer',
         //OSM:
-        'http://irs.gis-lab.info/',
+       // 'http://irs.gis-lab.info/', //neither swiss projection nor epsg:4326
         'http://ows.terrestris.de/osm/service?',
         'http://ows.terrestris.de/osm-gray/service?',
         //BadenWürtemberg
@@ -31,10 +41,9 @@ goog.provide('ga_importwms_controller');
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000013100001/MapServer/WMSServer',
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000001500003/MapServer/WMSServer',
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000004200001/MapServer/WMSServer',
-
+        //other
         'http://www.webatlasde.de/arcgis/services/Maps4BW/MapServer/WMSServer',
-
-        //until here test urls
+        // ***** until here test urls - non-Swiss projected  *****
         'https://wms.geo.admin.ch/',
         'http://ogc.heig-vd.ch/mapserver/wms',
         'http://owsproxy.lgl-bw.de/owsproxy/ows/WMS_Maps4BW',
