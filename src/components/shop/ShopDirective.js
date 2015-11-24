@@ -33,28 +33,15 @@ goog.require('ga_map_service');
           return;
         }
         var layerConfig = gaLayers.getLayer(layerBodId);
-        if (/skitouren/.test(layerBodId)) {
-          layerConfig.shop_option_arr = ['mapsheet'];
-        }
-        if (/pixelkart/.test(layerBodId)) {
-          layerConfig.shop_option_arr = [
-            'mapsheet',
-            'commune',
-            'district',
-            'canton',
-            'rectangle',
-            'whole'
-          ];
-        }
 
         // Remove the element if no shop config available
-        if (!layerConfig || !layerConfig.shop_option_arr ||
-            layerConfig.shop_option_arr.length == 0) {
+        if (!layerConfig || !layerConfig.shop ||
+            layerConfig.shop.length == 0) {
           elt.remove();
           return;
         }
 
-        scope.orderTypes = layerConfig.shop_option_arr;
+        scope.orderTypes = layerConfig.shop;
         scope.orderType = scope.orderTypes[0];
 
         // {mapsheet,commune,district,canton,rectangle,whole}
