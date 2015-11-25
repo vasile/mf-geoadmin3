@@ -47,8 +47,10 @@ goog.require('ga_map_service');
         // {mapsheet,commune,district,canton,rectangle,whole}
         // Order a mapsheet
         scope.orderMapsheet = function() {
-          window.open('http://www.toposhop.admin.ch/?lang=' + gaLang.get() +
-              '&' + layerBodId + '=' + scope.feature.id);
+          $window.open('https://shop-shopbgdi.openshift.puzzle.ch/#/' +
+              gaLang.get() +
+              '/dispatcher?layers=' + layerBodId + '&' + layerBodId + '=' +
+              scope.feature.id);
         };
         scope.chooseOrderType = function(ifScope) {
           scope.orderType = ifScope.orderType;
@@ -57,8 +59,6 @@ goog.require('ga_map_service');
           var func = scope['order' + cap];
           if (typeof func == 'function') {
             func();
-          } else {
-            $window.console.log('order' + cap + ' not supported yet !');
           }
         };
       }
