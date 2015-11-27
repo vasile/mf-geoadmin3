@@ -495,7 +495,7 @@ $(addprefix .build-artefacts/annotated/, $(SRC_JS_FILES) src/TemplateCacheModule
 .build-artefacts/python-venv/bin/mako-render: .build-artefacts/python-venv
 	${PYTHON_CMD} .build-artefacts/python-venv/bin/pip install "Mako==1.0.0"
 	touch $@
-	@ if [[ ! -e .build-artefacts/python-venv/local ]]; then \
+	@ if [ ! -e .build-artefacts/python-venv/local ]; then \
 	    ln -s . .build-artefacts/python-venv/local; \
 	fi
 	cp scripts/cmd.py .build-artefacts/python-venv/local/lib/python2.7/site-packages/mako/cmd.py
