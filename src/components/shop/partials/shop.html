@@ -1,7 +1,19 @@
-<button ng-if="orderTypes.length == 1" class="btn btn-default"
-        ng-click="orderMapsheet()" translate>shop_order</button>
-<select ng-if="orderTypes.length > 1"
-        ng-model="orderType"
-        ng-options="label for label in orderTypes"
-        ng-change="chooseOrderType(this)">
-</select>
+<div class="ga-shop-order" ng-hide="showConfirm">
+  <button ng-show="orderTypes.length == 1" class="btn btn-default"
+          ng-click="orderMapsheet()"
+          translate>shop_order</button>
+  <select ng-show="orderTypes.length > 1"
+          ng-model="orderType"
+          ng-options="label for label in orderTypes"
+          ng-change="chooseOrderType(this)">
+  </select>
+</div>
+<div class="ga-shop-confirm" ng-show="showConfirm">
+  <div translate>shop_confirm</div>
+  <div class="ga-shop-btns">
+    <button ng-if="orderTypes.length == 1" class="btn btn-default"
+            ng-click="goToShop()" translate>shop_go_to</button>
+    <button ng-if="orderTypes.length == 1" class="btn btn-default"
+          ng-click="confirm(false)" translate>shop_cancel</button>
+  </div>
+</div>

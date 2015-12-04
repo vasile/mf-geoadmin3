@@ -6,7 +6,7 @@ goog.require('ga_map_service');
     'ga_map_service'
   ]);
 
-  module.directive('gaShop', function($window, gaLang, gaLayers) {
+  module.directive('gaShop', function($window, gaLang, gaLayers, gaMapUtils) {
     return {
       restrict: 'A',
       templateUrl: function(element, attrs) {
@@ -17,6 +17,9 @@ goog.require('ga_map_service');
         feature: '=gaShopFeature'
       },
       link: function(scope, elt, attrs, controller) {
+        var winShopName = 'toposhop';
+        var winShop;
+        scope.showConfirm = false;
 
         // Remove the element if no feature defined
         if (!scope.feature) {
@@ -43,14 +46,24 @@ goog.require('ga_map_service');
 
         scope.orderTypes = layerConfig.shop;
         scope.orderType = scope.orderTypes[0];
-
+        scope.orderMapsheet = function() {
+          gaMapUtils.zoomToExtent(scope.map, null, scope.feature.bbox);
+          scope.showConfirm = true;
+        };
+        scope.confirm = function(showConfirm) {
+           scope.showConfirm = showConfirm;
+        };
         // {mapsheet,commune,district,canton,rectangle,whole}
         // Order a mapsheet
-        scope.orderMapsheet = function() {
-          $window.open('https://shop-shopbgdi.openshift.puzzle.ch/#/' +
-              gaLang.get() +
+        scope.goToShop = function() {
+          if (winShop) {
+            winShop.focus();
+          }
+          winShop = $window.open(
+              'https://shop-shopbgdi.openshift.puzzle.ch/#/' + gaLang.get() +
               '/dispatcher?layers=' + layerBodId + '&' + layerBodId + '=' +
-              scope.feature.id);
+              scope.feature.id + '&target=' + winShopName, winShopName);
+          scope.showConfirm = false;
         };
         scope.chooseOrderType = function(ifScope) {
           scope.orderType = ifScope.orderType;
