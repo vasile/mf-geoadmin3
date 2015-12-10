@@ -70,7 +70,7 @@ help:
 	@echo "- deploybranch     Deploys current branch to test (note: takes code from github)"
 	@echo "- deploybranchint  Deploys current branch to test and int (note: takes code from github)"
 	@echo "- deploybranchdemo Deploys current branch to test and demo (note: takes code from github)"
-	@echo "- ol               Update ol.js and ol-debug.js "
+	@echo "- ol3cesium        Update ol3cesium.js and ol3cesium-debug.js "
 	@echo "- translate        Generate the translation files (requires db user pwd in ~/.pgpass: dbServer:dbPort:*:dbUser:dbUserPwd)"
 	@echo "- help             Display this help"
 	@echo
