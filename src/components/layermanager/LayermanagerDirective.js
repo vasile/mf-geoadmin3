@@ -141,18 +141,16 @@ goog.require('ga_urlutils_service');
           scope.filteredLayers = (items) ? items.slice().reverse() : [];
         });
 
-        var dragDropTimeout;
-        var layermanager = $('[ga-layermanager] ul');
-        var dragAndDropLayermanager;
         // Use to disable drag and drop if the user drops the layer at its
         // initial place.
         var dragging = false;
+        var slip;
 
         var disableDragAndDrop = function() {
           dragging = false;
-          dragAndDropLayermanager.remove();
-          dragAndDropLayermanager = undefined;
-          layermanager.show();
+          if (slip) {
+            slip.detach();
+          }
           // Force a $digest so the new order of the layers is correctly taken
           // into account.
           $timeout();
@@ -163,44 +161,26 @@ goog.require('ga_urlutils_service');
           console.log('drag & drop mode: on');
           dragging = true;
 
-          // Get the element on the real layermanager to set the focus on the
-          // proper element of the clone.
-          var index = $('[ga-layermanager] ul label.ga-checkbox')
-              .index(mousedownEvent.target);
           // If the user has the focus on the wrong element (eg the
           // transparency selector) we must not enable the drag and drop in
           // order not to break functonnalities.
+          var index = $('[ga-layermanager] ul label.ga-checkbox')
+              .index(mousedownEvent.target);
           if (index === -1) {
-            dragging = false;
+            disableDragAndDrop();
             return;
           }
-
-          cloneLayermanager();
-
-          var target = $('#drag-drop label.ga-checkbox').get(index);
-          mousedownEvent.target = target;
 
           configureSlipjs(mousedownEvent);
         };
 
-
-        var cloneLayermanager = function() {
-          dragAndDropLayermanager = layermanager.clone();
-          layermanager.hide();
-
-          // Remove angular-attributes that may cause problems
-          dragAndDropLayermanager.children().removeAttr('ng-class');
-          dragAndDropLayermanager.children().removeAttr('ng-repeat');
-          dragAndDropLayermanager.children().removeAttr('ng-click');
-
-          // Configure the clone for slipjs
-          dragAndDropLayermanager.prependTo('[ga-layermanager]');
-          dragAndDropLayermanager.attr('id', 'drag-drop');
-        };
-
         var configureSlipjs = function(mousedownEvent) {
           var list = document.querySelector('ul#drag-drop');
-          var slip = new Slip(list);
+          if (!slip) {
+            slip = new Slip(list);
+          } else {
+            slip.attach(list);
+          }
 
           list.addEventListener('slip:beforewait', function(e) {
             // if prevented element will be dragged (instead of page scrolling)
@@ -228,10 +208,6 @@ goog.require('ga_urlutils_service');
 
         element.bind('mouseup', function() {
           console.log('mouseup');
-          if (dragDropTimeout !== undefined) {
-            clearTimeout(dragDropTimeout);
-            dragDropTimeout = undefined;
-          }
           if (dragging) {
             disableDragAndDrop();
           }
