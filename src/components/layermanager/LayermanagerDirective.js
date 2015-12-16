@@ -193,10 +193,19 @@ goog.require('ga_urlutils_service');
             var originalIndex = length - 1 - e.detail.originalIndex;
             var spliceIndex = length - 1 - e.detail.spliceIndex;
 
+            console.log('original', originalIndex);
+            console.log('splice', spliceIndex);
+
             var layersCollection = map.getLayers();
             var layer = layersCollection.item(originalIndex);
+            console.log(layersCollection.getArray().map(function(layer) {
+              return layer.bodId;
+            }));
             layersCollection.removeAt(originalIndex);
             layersCollection.insertAt(spliceIndex, layer);
+            console.log(layersCollection.getArray().map(function(layer) {
+              return layer.bodId;
+            }));
 
             disableDragAndDrop();
           });
