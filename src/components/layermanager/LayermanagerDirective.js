@@ -141,6 +141,102 @@ goog.require('ga_urlutils_service');
           scope.filteredLayers = (items) ? items.slice().reverse() : [];
         });
 
+        var dragDropTimeout;
+        var layermanager = $('[ga-layermanager] ul');
+        var dragAndDropLayermanager;
+        // Use to disable drag and drop if the user drops the layer at its
+        // initial place.
+        var dragging = false;
+
+        var disableDragAndDrop = function() {
+          dragging = false;
+          dragAndDropLayermanager.remove();
+          dragAndDropLayermanager = undefined;
+          layermanager.show();
+          // Force a $digest so the new order of the layers is correctly taken
+          // into account.
+          $timeout();
+          console.log('drag & drop mode: off');
+        };
+
+        var enableDragAndDrop = function(mousedownEvent) {
+          console.log('drag & drop mode: on');
+          dragging = true;
+
+          // Get the element on the real layermanager to set the focus on the
+          // proper element of the clone.
+          var index = $('[ga-layermanager] ul label.ga-checkbox')
+              .index(mousedownEvent.target);
+          // If the user has the focus on the wrong element (eg the
+          // transparency selector) we must not enable the drag and drop in
+          // order not to break functonnalities.
+          if (index === -1) {
+            dragging = false;
+            return;
+          }
+
+          cloneLayermanager();
+
+          var target = $('#drag-drop label.ga-checkbox').get(index);
+          mousedownEvent.target = target;
+
+          configureSlipjs(mousedownEvent);
+        };
+
+
+        var cloneLayermanager = function() {
+          dragAndDropLayermanager = layermanager.clone();
+          layermanager.hide();
+
+          // Remove angular-attributes that may cause problems
+          dragAndDropLayermanager.children().removeAttr('ng-class');
+          dragAndDropLayermanager.children().removeAttr('ng-repeat');
+          dragAndDropLayermanager.children().removeAttr('ng-click');
+
+          // Configure the clone for slipjs
+          dragAndDropLayermanager.prependTo('[ga-layermanager]');
+          dragAndDropLayermanager.attr('id', 'drag-drop');
+        };
+
+        var configureSlipjs = function(mousedownEvent) {
+          var list = document.querySelector('ul#drag-drop');
+          var slip = new Slip(list);
+
+          list.addEventListener('slip:beforewait', function(e) {
+            // if prevented element will be dragged (instead of page scrolling)
+            e.preventDefault();
+          });
+
+          list.addEventListener('slip:reorder', function(e) {
+            e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
+            var length = scope.layers.length;
+            var originalIndex = length - 1 - e.detail.originalIndex;
+            var spliceIndex = length - 1 - e.detail.spliceIndex;
+
+            var layersCollection = map.getLayers();
+            var layer = layersCollection.item(originalIndex);
+            layersCollection.removeAt(originalIndex);
+            layersCollection.insertAt(spliceIndex, layer);
+
+            disableDragAndDrop();
+          });
+
+          slip.onMouseDown(mousedownEvent);
+        };
+
+        element.bind('mousedown', enableDragAndDrop);
+
+        element.bind('mouseup', function() {
+          console.log('mouseup');
+          if (dragDropTimeout !== undefined) {
+            clearTimeout(dragDropTimeout);
+            dragDropTimeout = undefined;
+          }
+          if (dragging) {
+            disableDragAndDrop();
+          }
+        });
+
         // On mobile we use a classic select box, on desktop a popover
         if (!scope.mobile) {
           // Simulate a select box with a popover
