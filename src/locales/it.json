@@ -320,6 +320,7 @@
 "shop_cancel": "Annuler",
 "shop_confirm": "Pour continuer la commande, votre sélection sera redirigé vers le shop.",
 "shop_go_to": "Aller au shop",
+"shop_not_available": "The map is currently not available in the Shop.",
 "shop_order": "Commander",
 "show_more_options": "Previsualizzazione",
 "show_more_results": "Mostra altri risultati ...",
