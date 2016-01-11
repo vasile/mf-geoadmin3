@@ -44,6 +44,12 @@ goog.require('ga_map_service');
           return;
         }
 
+        // The feature is not available in the shop so we display a message
+        if (!scope.feature.properties.available) {
+          scope.notAvailable = true;
+          return;
+        }
+
         scope.orderTypes = layerConfig.shop;
         scope.orderType = scope.orderTypes[0];
         scope.orderMapsheet = function() {
