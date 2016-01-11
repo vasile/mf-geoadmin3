@@ -572,9 +572,6 @@ goog.require('ga_topic_service');
                   });
                 }
                 popup.open();
-                console.log(map.getSize()[0] -
-                        parseFloat(popup.element.css('max-width')) - 58);
-
               }
               // Add result to array. ng-repeat will take
               // care of the rest
