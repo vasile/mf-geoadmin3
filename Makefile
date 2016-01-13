@@ -269,6 +269,7 @@ prd/lib/: src/lib/d3.min.js \
 	cp -rf  $^ $@
 
 prd/lib/build.js: src/lib/jquery.min.js \
+	    src/lib/slip.js \
 	    src/lib/bootstrap.min.js \
 	    src/lib/moment-with-customlocales.min.js \
 	    src/lib/typeahead-0.9.3.min.js \
@@ -480,6 +481,7 @@ node_modules: package.json
 	    --externs externs/ol.js \
 	    --externs externs/ol3-cesium.js \
 	    --externs externs/Cesium.externs.js \
+	    --externs externs/slip.js \
 	    --externs externs/angular.js \
 	    --externs externs/jquery.js \
 	    --js_output_file $@
