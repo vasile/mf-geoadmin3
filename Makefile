@@ -456,12 +456,14 @@ node_modules: JQUERY = jquery.js jquery.min.js
 node_modules: JQUERYXDOMAIN = jQuery.XDomainRequest.js  jquery.xdomainrequest.min.js
 node_modules: D3 = d3.js  d3.min.js
 node_modules: BOOTSTRAP = bootstrap.js bootstrap.min.js
+node_modules: SLIPJS = slip.js
 node_modules: package.json
 	npm install
 	cp $(addprefix node_modules/angular/,$(ANGULAR_JS)) src/lib/;
 	cp $(addprefix node_modules/angular-translate/dist/,$(ANGULAR_TRANSLATE_JS)) src/lib/;
 	cp $(addprefix node_modules/angular-translate/dist/angular-translate-loader-static-files/,$(ANGULAR_TRANSLATE_LOADER_JS)) src/lib/;
 	cp $(addprefix node_modules/localforage/dist/,$(LOCALFORAGE)) src/lib/;
+	cp $(addprefix node_modules/slipjs/,$(SLIPJS)) src/lib;
 	cp $(addprefix node_modules/jquery/dist/,$(JQUERY)) src/lib/;
 	cp $(addprefix node_modules/jquery-ajax-transport-xdomainrequest/,$(JQUERYXDOMAIN)) src/lib/;
 	cp $(addprefix node_modules/d3/,$(D3)) src/lib/;
