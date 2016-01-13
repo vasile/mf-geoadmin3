@@ -154,11 +154,9 @@ goog.require('ga_urlutils_service');
           // Force a $digest so the new order of the layers is correctly taken
           // into account.
           $timeout();
-          console.log('drag & drop mode: off');
         };
 
         var enableDragAndDrop = function(mousedownEvent) {
-          console.log('drag & drop mode: on');
           dragging = true;
 
           // If the user has the focus on the wrong element (eg the
@@ -187,27 +185,23 @@ goog.require('ga_urlutils_service');
             e.preventDefault();
           });
 
-          list.addEventListener('slip:reorder', function(e) {
-            e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
-            var length = scope.layers.length;
-            var originalIndex = length - 1 - e.detail.originalIndex;
-            var spliceIndex = length - 1 - e.detail.spliceIndex;
+          list.addEventListener('slip:reorder', function(evt) {
+            // The slip:reorder may be fired multiple times. If the dropped
+            // already took place, we mustn't do anything.
+            if (!dragging) {
+              evt.preventDefault();
+              return;
+            }
 
-            console.log('original', originalIndex);
-            console.log('splice', spliceIndex);
+            var delta = evt.detail.originalIndex - evt.detail.spliceIndex;
+            var layer = scope.filteredLayers[evt.detail.originalIndex];
 
-            var layersCollection = map.getLayers();
-            var layer = layersCollection.item(originalIndex);
-            console.log(layersCollection.getArray().map(function(layer) {
-              return layer.bodId;
-            }));
-            layersCollection.removeAt(originalIndex);
-            layersCollection.insertAt(spliceIndex, layer);
-            console.log(layersCollection.getArray().map(function(layer) {
-              return layer.bodId;
-            }));
-
-            disableDragAndDrop();
+            if (delta !== 0) {
+              evt.target.parentNode.insertBefore(
+                  evt.target, evt.detail.insertBefore);
+              scope.moveLayer(evt, layer, delta);
+              disableDragAndDrop();
+            }
           });
 
           slip.onMouseDown(mousedownEvent);
@@ -216,7 +210,6 @@ goog.require('ga_urlutils_service');
         element.bind('mousedown', enableDragAndDrop);
 
         element.bind('mouseup', function() {
-          console.log('mouseup');
           if (dragging) {
             disableDragAndDrop();
           }
@@ -267,7 +260,7 @@ goog.require('ga_urlutils_service');
           // Find the next/previous layer with zIndex=0
           for (var i = index + delta; i < layersCollection.getLength() ||
               i >= 0; i += delta) {
-            if (layersCollection.item(i).getZIndex() == 0) {
+            if (layersCollection.item(i).getZIndex() === 0) {
               insertIndex = i;
               break;
             }
