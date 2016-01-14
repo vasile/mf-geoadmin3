@@ -277,7 +277,7 @@ prd/lib/: src/lib/d3.min.js \
 	cp -rf  $^ $@
 
 prd/lib/build.js: src/lib/jquery.min.js \
-	    src/lib/slip.js \
+	    src/lib/slip.min.js \
 	    src/lib/bootstrap.min.js \
 	    src/lib/moment-with-customlocales.min.js \
 	    src/lib/typeahead-0.9.3.min.js \
