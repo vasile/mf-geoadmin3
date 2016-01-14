@@ -216,6 +216,14 @@ fastclick: .build-artefacts/fastclick
 	    --compilation_level SIMPLE_OPTIMIZATIONS \
 	    --js_output_file  src/lib/fastclick.min.js
 
+.PHONY: slipjs
+slipjs: node_modules .build-artefacts/closure-compiler/compiler.jar node_modules/slipjs
+	java -jar .build-artefacts/closure-compiler/compiler.jar \
+	    src/lib/slip.js \
+	    --compilation_level SIMPLE_OPTIMIZATIONS \
+	    --language_in ECMASCRIPT5 \
+	    --js_output_file src/lib/slipjs.min.js
+
 .PHONY: typeahead
 typeahead:
 	java -jar node_modules/google-closure-compiler/compiler.jar \
