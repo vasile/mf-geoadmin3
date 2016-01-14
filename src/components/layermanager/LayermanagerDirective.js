@@ -145,11 +145,39 @@ goog.require('ga_urlutils_service');
         // initial place.
         var dragging = false;
         var slip;
+        var list;
+
+        var slipBeforewaitCallback = function(e) {
+          // if prevented element will be dragged (instead of page scrolling)
+          e.preventDefault();
+        };
+
+        var slipReorderCallback = function(evt) {
+          // The slip:reorder may be fired multiple times. If the dropped
+          // already took place, we mustn't do anything.
+          if (!dragging) {
+            evt.preventDefault();
+            return;
+          }
+
+          var delta = evt.detail.originalIndex - evt.detail.spliceIndex;
+          var layer = scope.filteredLayers[evt.detail.originalIndex];
+
+          if (delta !== 0) {
+            evt.target.parentNode.insertBefore(
+                evt.target, evt.detail.insertBefore);
+            scope.moveLayer(evt, layer, delta);
+            disableDragAndDrop();
+          }
+        };
 
         var disableDragAndDrop = function() {
           dragging = false;
           if (slip) {
             slip.detach();
+            list.removeEventListener('slip:beforewait',
+                slipBeforewaitCallback);
+            list.removeEventListener('slip:reorder', slipReorderCallback);
           }
           // Force a $digest so the new order of the layers is correctly taken
           // into account.
@@ -173,36 +201,16 @@ goog.require('ga_urlutils_service');
         };
 
         var configureSlipjs = function(mousedownEvent) {
-          var list = element.find('> ul').get(0);
+          list = element.find('> ul').get(0);
           if (!slip) {
             slip = new Slip(list);
           } else {
             slip.attach(list);
           }
 
-          list.addEventListener('slip:beforewait', function(e) {
-            // if prevented element will be dragged (instead of page scrolling)
-            e.preventDefault();
-          });
+          list.addEventListener('slip:beforewait', slipBeforewaitCallback);
 
-          list.addEventListener('slip:reorder', function(evt) {
-            // The slip:reorder may be fired multiple times. If the dropped
-            // already took place, we mustn't do anything.
-            if (!dragging) {
-              evt.preventDefault();
-              return;
-            }
-
-            var delta = evt.detail.originalIndex - evt.detail.spliceIndex;
-            var layer = scope.filteredLayers[evt.detail.originalIndex];
-
-            if (delta !== 0) {
-              evt.target.parentNode.insertBefore(
-                  evt.target, evt.detail.insertBefore);
-              scope.moveLayer(evt, layer, delta);
-              disableDragAndDrop();
-            }
-          });
+          list.addEventListener('slip:reorder', slipReorderCallback);
 
           slip.onMouseDown(mousedownEvent);
         };
