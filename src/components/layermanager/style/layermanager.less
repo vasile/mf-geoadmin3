@@ -8,6 +8,10 @@
     padding: 0;
     overflow: hidden;
     .transition(height .35s ease);
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
   li, li > div {
@@ -247,14 +251,3 @@
     color: #f00;
   }
 }
-
-
-#drag-drop {
-  li {
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-}
-

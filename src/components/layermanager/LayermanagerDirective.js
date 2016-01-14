@@ -173,7 +173,7 @@ goog.require('ga_urlutils_service');
         };
 
         var configureSlipjs = function(mousedownEvent) {
-          var list = document.querySelector('ul#drag-drop');
+          var list = element.find('> ul').get(0);
           if (!slip) {
             slip = new Slip(list);
           } else {
