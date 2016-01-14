@@ -153,7 +153,7 @@ goog.require('ga_urlutils_service');
           }
           // Force a $digest so the new order of the layers is correctly taken
           // into account.
-          $timeout();
+          scope.$applyAsync();
         };
 
         var enableDragAndDrop = function(mousedownEvent) {
