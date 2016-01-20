@@ -149,8 +149,11 @@ goog.require('ga_urlutils_service');
         var list;
 
         var slipBeforewaitCallback = function(e) {
-          // if prevented element will be dragged (instead of page scrolling)
-          e.preventDefault();
+          if (!gaBrowserSniffer.mobile) {
+            // Enable drag on desktop. If this event is prevented on mobile,
+            // scrolling will not work as intended.
+            e.preventDefault();
+          }
         };
 
         var slipReorderCallback = function(evt) {
