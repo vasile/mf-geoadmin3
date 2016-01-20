@@ -139,7 +139,6 @@ goog.require('ga_urlutils_service');
         scope.layerFilter = gaLayerFilters.selected;
         scope.$watchCollection('layers | filter:layerFilter', function(items) {
           scope.filteredLayers = (items) ? items.slice().reverse() : [];
-          scope.disableDragAndDrop();
           scope.enableDragAndDrop();
         });
 
@@ -170,6 +169,8 @@ goog.require('ga_urlutils_service');
                 evt.target, evt.detail.insertBefore);
             scope.moveLayer(evt, layer, delta);
           }
+
+          scope.disableDragAndDrop();
         };
 
         scope.disableDragAndDrop = function() {
