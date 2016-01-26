@@ -766,11 +766,13 @@ itemscope itemtype="http://schema.org/WebApplication"
           gaLayersProvider.wmtsGetTileUrlTemplate = '//wmts{s}.geo.admin.ch/1.0.0/{Layer}/default/{Time}/{TileMatrixSet}/{z}/{y}/{x}.{Format}';
           gaLayersProvider.wmtsMapProxyGetTileUrlTemplate = '//wmts{s}.geo.admin.ch/1.0.0/{Layer}/default/{Time}/{TileMatrixSet}/{z}/{x}/{y}.{Format}';
           gaLayersProvider.terrainTileUrlTemplate = '//3d.geo.admin.ch/1.0.0/{Layer}/default/{Time}/4326';
-          gaLayersProvider.layersConfigUrlTemplate = gaGlobalOptions.resourceUrl + 'layersConfig?lang={Lang}';
+          //gaLayersProvider.layersConfigUrlTemplate = gaGlobalOptions.resourceUrl + 'layersConfig?lang={Lang}';
+          gaLayersProvider.layersConfigUrlTemplate = gaGlobalOptions.cachedApiUrl  + '/rest/services/all/MapServer/layersConfig?lang={Lang}';
           gaLayersProvider.legendUrlTemplate = gaGlobalOptions.apiUrl + '/rest/services/all/MapServer/{Layer}/legend?lang={Lang}';
         });
         module.config(function(gaTopicProvider, gaGlobalOptions) {
-          gaTopicProvider.topicsUrl = gaGlobalOptions.resourceUrl + 'services';
+          //gaTopicProvider.topicsUrl = gaGlobalOptions.resourceUrl + 'services';
+          gaTopicProvider.topicsUrl = gaGlobalOptions.cachedApiUrl + '/rest/services';
         });
 
         module.config(function(gaExportKmlProvider, gaGlobalOptions) {
