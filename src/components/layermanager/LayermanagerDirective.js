@@ -148,14 +148,6 @@ goog.require('ga_urlutils_service');
         var slip;
         var list;
 
-        var slipBeforewaitCallback = function(e) {
-          if (!gaBrowserSniffer.mobile) {
-            // Enable drag on desktop. If this event is prevented on mobile,
-            // scrolling will not work as intended.
-            e.preventDefault();
-          }
-        };
-
         var slipReorderCallback = function(evt) {
           // The slip:reorder may be fired multiple times. If the dropped
           // already took place, we mustn't do anything.
@@ -171,17 +163,14 @@ goog.require('ga_urlutils_service');
             evt.target.parentNode.insertBefore(
                 evt.target, evt.detail.insertBefore);
             scope.moveLayer(evt, layer, delta);
+            scope.disableDragAndDrop();
           }
-
-          scope.disableDragAndDrop();
         };
 
         scope.disableDragAndDrop = function() {
           dragging = false;
           if (slip) {
             slip.detach();
-            list.removeEventListener('slip:beforewait',
-                slipBeforewaitCallback);
             list.removeEventListener('slip:reorder', slipReorderCallback);
           }
           // Force a $digest so the new order of the layers is correctly taken
@@ -202,8 +191,6 @@ goog.require('ga_urlutils_service');
           } else {
             slip.attach(list);
           }
-
-          list.addEventListener('slip:beforewait', slipBeforewaitCallback);
 
           list.addEventListener('slip:reorder', slipReorderCallback);
         };
