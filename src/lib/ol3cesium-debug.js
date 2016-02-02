@@ -44563,7 +44563,16 @@ olcs.GaRasterSynchronizer.prototype.convertLayerToCesiumImageries =
 
   var providers = Array.isArray(provider) ? provider : [provider];
   return providers.map(function(p) {
-    return new Cesium.ImageryLayer(p);
+    var options;
+
+    // We deactivate client zoom if necessary
+    if (p._maximumRetrievingLevel && p.maximumLevel &&
+        p._maximumRetrievingLevel == p.maximumLevel) {
+      options = {
+        maximumTerrainLevel: p.maximumLevel
+      };
+    }
+    return new Cesium.ImageryLayer(p, options);
   });
 };
 
