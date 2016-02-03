@@ -84,8 +84,7 @@ goog.require('ga_urlutils_service');
 
               if (result.Capability.Layer) {
                 var root = getChildLayers(result.Capability.Layer,
-                    $scope.map.getView().getProjection().getCode(),
-                    result.version);
+                    $scope.map, result.version);
                 if (root) {
                   $scope.layers = root.Layer;
                 }
@@ -162,8 +161,9 @@ goog.require('ga_urlutils_service');
           };
 
           // Go through all layers, assign needed properties,
-          // and remove useless layers (no name or bad crs without childs)
-          var getChildLayers = function(layer, projCode, wmsVersion) {
+          // and remove useless layers (no name or bad crs without children
+          // or no intersection between map extent and layer extent)
+          var getChildLayers = function(layer, map, wmsVersion) {
 
             // If projCode is undefined that means the parent layer can be
             // displayed with the current map projection, since it's an herited
@@ -171,6 +171,9 @@ goog.require('ga_urlutils_service');
             // We don't have proj codes list for wms 1.1.1 so we assume the
             // layer can be displayed (wait for
             // https://github.com/openlayers/ol3/pull/2944)
+
+            var projCode = map.getView().getProjection().getCode();
+
             if (wmsVersion == '1.3.0' && projCode) {
               if (!canUseProj(layer, projCode)) {
                 layer.useReprojection = true;
@@ -185,6 +188,13 @@ goog.require('ga_urlutils_service');
               layer.Abstract = 'layer_invalid_no_name';
             }
 
+            // if there is no intersection between the map-extent
+            // and the WMS-layer-extent, the layer is set as invalid
+            if (!intersectRect(map, layer)) {
+              layer.isInvalid = true;
+              layer.Abstract = 'layer_invalid_no_intersection_with_map_extent';
+            }
+
             if (!layer.isInvalid) {
               layer.wmsUrl = $scope.fileUrl;
               layer.wmsVersion = wmsVersion;
@@ -196,7 +206,7 @@ goog.require('ga_urlutils_service');
             if (layer.Layer) {
 
               for (var i = 0; i < layer.Layer.length; i++) {
-                var l = getChildLayers(layer.Layer[i], projCode, wmsVersion);
+                var l = getChildLayers(layer.Layer[i], map, wmsVersion);
                 if (!l) {
                   layer.Layer.splice(i, 1);
                   i--;
@@ -214,6 +224,14 @@ goog.require('ga_urlutils_service');
             }
 
             return layer;
+          };
+
+          // This function returns true if the two rectangles intersect
+          var intersectRect = function(r1, r2) {
+            return !(r1[0] > r2[2] ||
+                    r2[2] < r1[0] ||
+                    r2[1] > r1[3] ||
+                    r2[3] < r1[1]);
           };
 
           // Get the layer extent defines in the GetCapabilities
@@ -290,30 +308,51 @@ goog.require('ga_urlutils_service');
       var view = map.getView();
       var mapSize = map.getSize();
 
-      // If a minScale is defined
-      if (layer.MaxScaleDenominator && extent) {
+      var mapExtent = map.previousExtent_;
+      var x1 = mapExtent[0];
+      var y1 = mapExtent[1];
+      var x2 = mapExtent[2];
+      var y2 = mapExtent[3];
 
-        // We test if the layer extent specified in the
-        // getCapabilities fit the minScale value.
-        var layerExtentScale = getScaleFromExtent(view, extent, mapSize);
+      var layerExtentCenter = ol.extent.getCenter(extent);
+      var LCx = layerExtentCenter[0];
+      var LCy = layerExtentCenter[1];
 
-        if (layerExtentScale > layer.MaxScaleDenominator) {
-          var layerExtentCenter = ol.extent.getCenter(extent);
-          var factor = layerExtentScale / layer.MaxScaleDenominator;
-          var width = ol.extent.getWidth(extent) / factor;
-          var height = ol.extent.getHeight(extent) / factor;
-          extent = [
-            layerExtentCenter[0] - width / 2,
-            layerExtentCenter[1] - height / 2,
-            layerExtentCenter[0] + width / 2,
-            layerExtentCenter[1] + height / 2
-          ];
-
-          var res = view.constrainResolution(
+      // If the center of the layer extent is out of the map-extent-dx or
+      // map-extent-dy, the map extent is set as extent for the layer zoom in
+      if ((LCx < x1) || (LCx > x2) || (LCy < y1) || (LCy > y2)) {
+        extent = mapExtent;
+        var mapExtentCenter = ol.extent.getCenter(extent);
+        var res = view.constrainResolution(
               view.getResolutionForExtent(extent, mapSize), 0, -1);
-          view.setCenter(layerExtentCenter);
-          view.setResolution(res);
-          return;
+        view.setCenter(mapExtentCenter);
+        view.setResolution(res);
+        return;
+      } else {
+        // If a minScale is defined
+        if (layer.MaxScaleDenominator && extent) {
+
+          // We test if the layer extent specified in the
+          // getCapabilities fit the minScale value.
+          var layerExtentScale = getScaleFromExtent(view, extent, mapSize);
+
+          if (layerExtentScale > layer.MaxScaleDenominator) {
+            var factor = layerExtentScale / layer.MaxScaleDenominator;
+            var width = ol.extent.getWidth(extent) / factor;
+            var height = ol.extent.getHeight(extent) / factor;
+            extent = [
+              layerExtentCenter[0] - width / 2,
+              layerExtentCenter[1] - height / 2,
+              layerExtentCenter[0] + width / 2,
+              layerExtentCenter[1] + height / 2
+            ];
+
+            var res = view.constrainResolution(
+                view.getResolutionForExtent(extent, mapSize), 0, -1);
+            view.setCenter(layerExtentCenter);
+            view.setResolution(res);
+            return;
+          }
         }
       }
 
