@@ -16341,10 +16341,10 @@ ol.coordinate.createStringXY = function(opt_fractionDigits) {
  */
 ol.coordinate.degreesToStringHDMS_ = function(degrees, hemispheres) {
   var normalizedDegrees = goog.math.modulo(degrees + 180, 360) - 180;
-  var x = Math.abs(Math.round(3600 * normalizedDegrees));
+  var x = Math.abs(3600 * normalizedDegrees);
   return Math.floor(x / 3600) + '\u00b0 ' +
       goog.string.padNumber(Math.floor((x / 60) % 60), 2) + '\u2032 ' +
-      goog.string.padNumber(Math.floor(x % 60), 2) + '\u2033 ' +
+      goog.string.padNumber((x % 60), 2, 3) + '\u2033 ' +
       hemispheres.charAt(normalizedDegrees < 0 ? 1 : 0);
 };
 
