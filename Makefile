@@ -179,27 +179,6 @@ preparebranch: rc_branch scripts/00-$(GIT_BRANCH).conf
 .PHONY: ol3cesium
 ol3cesium: .build-artefacts/ol3-cesium
 	cd .build-artefacts/ol3-cesium; \
-	git reset HEAD --hard; \
-	git fetch --all; \
-	git checkout $(OL3_CESIUM_VERSION); \
-	git submodule update --recursive --init --force; \
-	cd ol3; \
-	git reset HEAD --hard; \
-	git fetch --all; \
-	git checkout $(OL3_VERSION); \
-	git show; \
-	cat ../../../scripts/ga-ol3-style.exports >> src/ol/style/style.js; \
-	cat ../../../scripts/ga-ol3-tilegrid.exports >> src/ol/tilegrid/tilegrid.js; \
-	cat ../../../scripts/ga-ol3-tilerange.exports >> src/ol/tilerange.js; \
-	cat ../../../scripts/ga-ol3-view.exports >> src/ol/view.js; \
-	npm install --production; \
-	node tasks/build-ext.js; \
-	cd ../cesium; \
-	git remote | grep c2c || git remote add c2c git://github.com/camptocamp/cesium; \
-	git fetch --all; \
-	git checkout $(CESIUM_VERSION); \
-	cd ..; \
-	git show; \
 	ln -T -f -s ../../../../ol3-cesium-plugin/ src/plugins/geoadmin; \
 	( cd cesium; [ -f node_modules/.bin/gulp ] || npm install ); \
 	( cd cesium; if [ -f "Build/Cesium/Cesium.js" ] ; then echo 'Skipping Cesium minified build'; else node_modules/.bin/gulp minifyRelease; fi ); \

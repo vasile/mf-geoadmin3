@@ -1117,10 +1117,10 @@ goog.require('ga_urlutils_service');
             provider = new Cesium.UrlTemplateImageryProvider({
               url: params.url,
               subdomains: params.subdomains,
-              minimumRetrievingLevel: minRetLod,
-              maximumRetrievingLevel: maxRetLod,
+              minimumTerrainLevel: minRetLod,
+              maximumTerrainLevel: maxRetLod,
               // This property active client zoom for next levels.
-              maximumLevel: maxLod,
+              maximumLevel: (maxRetLod) ? undefined : maxLod,
               rectangle: gaMapUtils.extentToRectangle(extent),
               tilingScheme: new Cesium.GeographicTilingScheme(),
               tileWidth: params.tileSize,

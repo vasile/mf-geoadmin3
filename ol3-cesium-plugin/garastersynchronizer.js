@@ -54,10 +54,10 @@ olcs.GaRasterSynchronizer.prototype.convertLayerToCesiumImageries =
     var options;
 
     // We deactivate client zoom if necessary
-    if (p._maximumRetrievingLevel && p.maximumLevel &&
-        p._maximumRetrievingLevel == p.maximumLevel) {
+    if (p.minimumTerrainLevel || p.maximumTerrainLevel) {
       options = {
-        maximumTerrainLevel: p.maximumLevel
+        minimumTerrainLevel: p.minimumTerrainLevel,
+        maximumTerrainLevel: p.maximumTerrainLevel
       };
     }
     return new Cesium.ImageryLayer(p, options);
