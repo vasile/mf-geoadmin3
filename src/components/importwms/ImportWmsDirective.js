@@ -323,11 +323,29 @@ goog.require('ga_urlutils_service');
       if ((LCx < x1) || (LCx > x2) || (LCy < y1) || (LCy > y2)) {
         extent = mapExtent;
         var mapExtentCenter = ol.extent.getCenter(extent);
-        var res = view.constrainResolution(
-              view.getResolutionForExtent(extent, mapSize), 0, -1);
-        view.setCenter(mapExtentCenter);
-        view.setResolution(res);
-        return;
+        if (layer.MaxScaleDenominator && extent) {
+          // We test if the layer extent specified in the
+          // getCapabilities fit the minScale value.
+          var mapExtentScale = getScaleFromExtent(view, extent, mapSize);
+
+          if (mapExtentScale > layer.MaxScaleDenominator) {
+            var factor = mapExtentScale / layer.MaxScaleDenominator;
+            var width = ol.extent.getWidth(extent) / factor;
+            var height = ol.extent.getHeight(extent) / factor;
+            extent = [
+              mapExtentCenter[0] - width / 2,
+              mapExtentCenter[1] - height / 2,
+              mapExtentCenter[0] + width / 2,
+              mapExtentCenter[1] + height / 2
+            ];
+
+            var res = view.constrainResolution(
+                  view.getResolutionForExtent(extent, mapSize), 0, -1);
+            view.setCenter(mapExtentCenter);
+            view.setResolution(res);
+            return;
+          }
+        }
       } else {
         // If a minScale is defined
         if (layer.MaxScaleDenominator && extent) {

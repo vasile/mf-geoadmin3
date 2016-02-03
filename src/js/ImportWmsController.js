@@ -8,8 +8,6 @@ goog.provide('ga_importwms_controller');
       proxyUrl: gaGlobalOptions.ogcproxyUrl,
       defaultGetCapParams: 'SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0',
       defaultWMSList: [
-        //next: parsed and not empty but nothing presented on Switzerland
-        'http://neowms.sci.gsfc.nasa.gov/wms/wms',
         //EUMETSAT realtime satellite products
         'http://eumetview.eumetsat.int/geoserver/wms',
         //Geology
@@ -42,6 +40,8 @@ goog.provide('ga_importwms_controller');
         'http://rips-gdi.lubw.baden-wuerttemberg.de/arcgis/services/wms/UIS_0100000004200001/MapServer/WMSServer',
         //other
         'http://www.webatlasde.de/arcgis/services/Maps4BW/MapServer/WMSServer',
+        //next: parsed and not empty but nothing presented on Switzerland
+        'http://neowms.sci.gsfc.nasa.gov/wms/wms',
         // ***** until here test urls - non-Swiss projected  *****
         'https://wms.geo.admin.ch/',
         'http://ogc.heig-vd.ch/mapserver/wms',
