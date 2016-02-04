@@ -371,5 +371,7 @@
   "geoloc_permission_denied": "",
   "geoloc_pos_unavailable": "",
   "geoloc_time_out": "",
-  "geoloc_unknown": ""
+  "geoloc_unknown": "",
+  "add_text_label": "",
+  "modify_text_color_label": ""
 }
