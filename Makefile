@@ -8,6 +8,8 @@ APACHE_BASE_PATH ?= /$(shell id -un)
 LAST_APACHE_BASE_PATH := $(shell if [ -f .build-artefacts/last-apache-base-path ]; then cat .build-artefacts/last-apache-base-path 2> /dev/null; else echo '-none-'; fi)
 API_URL ?= //mf-chsdi3.dev.bgdi.ch
 LAST_API_URL := $(shell if [ -f .build-artefacts/last-api-url ]; then cat .build-artefacts/last-api-url 2> /dev/null; else echo '-none-'; fi)
+BROWSERSTACK_TARGETURL ?= https://mf-geoadmin3.dev.bgdi.ch/dummy
+LAST_BROWSERSTACK_TARGETURL := $(shell if [ -f .build-artefacts/last-browserstack-url ]; then cat .build-artefacts/last-browserstack-url 2> /dev/null; else echo '-none-'; fi)
 PUBLIC_URL ?= //public.dev.bgdi.ch
 PUBLIC_URL_REGEXP ?= ^https?:\/\/public\..*\.(bgdi|admin)\.ch\/.*
 ADMIN_URL_REGEXP ?= ^(ftp|http|https):\/\/(.*(\.bgdi|\.geo\.admin)\.ch)
@@ -109,7 +111,8 @@ prod: prd/lib/ \
 	prd/locales/ \
 	prd/checker \
 	prd/cache/ \
-	prd/robots.txt
+	prd/robots.txt\
+	prd/boost.js
 
 .PHONY: dev
 dev: src/deps.js src/style/app.css src/index.html src/mobile.html src/embed.html
@@ -395,6 +398,12 @@ prd/checker: src/checker
 	mkdir -p $(dir $@)
 	cp $< $@
 
+prd/boost.js: src/boost.js
+	mkdir -p $(dir $@)
+	cp $< $@
+
+
+
 src/deps.js: $(SRC_JS_FILES) ${PYTHON_VENV}
 	${PYTHON_CMD} node_modules/google-closure-library/closure/bin/build/depswriter.py \
 	    --root_with_prefix="src/components components" \
@@ -431,6 +440,16 @@ src/TemplateCacheModule.js: src/TemplateCacheModule.mako.js \
 	${PYTHON_CMD} ${MAKO_CMD} \
 	    --var "partials=$(subst src/,,$(SRC_COMPONENTS_PARTIALS_FILES))" \
 	    --var "basedir=src" $< > $@
+
+src/boost.js: src/boost.mako.js \
+			.build-artefacts/last-version \
+			.build-artefacts/last-browserstack-url \
+			.build-artefacts/last-api-url \
+	    ${MAKO_CMD}
+	${PYTHON_CMD} ${MAKO_CMD} \
+			--var "apibase=$(API_URL)" \
+			--var "cachebase=$(BROWSERSTACK_TARGETURL)" \
+	    --var "version=$(VERSION)" $< > $@
 
 apache/app.conf: apache/app.mako-dot-conf \
 	    ${MAKO_CMD} \
@@ -591,6 +610,11 @@ scripts/00-$(GIT_BRANCH).conf: scripts/00-branch.mako-dot-conf \
 	mkdir -p $(dir $@)
 	test $(DEPLOY_TARGET) != $(LAST_DEPLOY_TARGET) && \
 	    echo $(DEPLOY_TARGET) > .build-artefacts/last-deploy-target || :
+
+.build-artefacts/last-browserstack-url::
+	mkdir -p $(dir $@)
+	test $(BROWSERSTACK_TARGETURL) != $(LAST_BROWSERSTACK_TARGETURL) && \
+	    echo $(BROWSERSTACK_TARGETURL) > .build-artefacts/last-browserstack-url || :
 
 .build-artefacts/ol3-cesium:
 	git clone --recursive https://github.com/openlayers/ol3-cesium.git $@
