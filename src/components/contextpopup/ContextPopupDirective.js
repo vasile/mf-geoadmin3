@@ -101,7 +101,7 @@ goog.require('ga_permalink');
 
               scope.coord21781 = formatCoordinates(coord21781, 1);
               scope.coord4326 = ol.coordinate.format(coord4326, '{y}, {x}', 5);
-              var coord4326String = ol.coordinate.toStringHDMS(coord4326).
+              var coord4326String = ol.coordinate.toStringHDMS(coord4326, 3).
                                    replace(/ /g, '');
               scope.coordiso4326 = coord4326String.replace(/N/g, 'N ');
               scope.coord2056 = formatCoordinates(coord2056, 2) + ' *';
