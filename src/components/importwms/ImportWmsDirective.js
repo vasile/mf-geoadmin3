@@ -190,9 +190,15 @@ goog.require('ga_urlutils_service');
 
             // if there is no intersection between the map-extent
             // and the WMS-layer-extent, the layer is set as invalid
-            if (!intersectRect(map, layer)) {
-              layer.isInvalid = true;
-              layer.Abstract = 'layer_invalid_no_intersection_with_map_extent';
+            if ((layer.Layer) && (!layer.Layer == undefined)) {
+              for (var i = 0; i < layer.Layer.length; i++) {
+                var l = getChildLayers(layer.Layer[i], map, wmsVersion);
+                if (!intersectRect(map.previousExtent_, l.extent)) {
+                  layer.isInvalid = true;
+                  layer.Abstract =
+                    'layer_invalid_no_intersection_with_map_extent';
+                }
+              }
             }
 
             if (!layer.isInvalid) {
