@@ -190,14 +190,18 @@ goog.require('ga_urlutils_service');
 
             // if there is no intersection between the map-extent
             // and the WMS-layer-extent, the layer is set as invalid
-            if ((layer.Layer) && (!layer.Layer == undefined)) {
+            if ((layer.Layer) && (layer.Layer !== undefined)) {
               for (var i = 0; i < layer.Layer.length; i++) {
                 var l = getChildLayers(layer.Layer[i], map, wmsVersion);
-                if (!intersectRect(map.previousExtent_, l.extent)) {
-                  layer.isInvalid = true;
-                  layer.Abstract =
-                    'layer_invalid_no_intersection_with_map_extent';
+                if (l.extent) {
+                  var intersection =
+                    ol.extent.intersects(map.previousExtent_, l.extent);
                 }
+              }
+              if (!intersection) {
+                layer.isInvalid = true;
+                layer.Abstract =
+                  'layer_invalid_no_intersection_with_map_extent';
               }
             }
 
@@ -230,14 +234,6 @@ goog.require('ga_urlutils_service');
             }
 
             return layer;
-          };
-
-          // This function returns true if the two rectangles intersect
-          var intersectRect = function(r1, r2) {
-            return !(r1[0] > r2[2] ||
-                    r2[2] < r1[0] ||
-                    r2[1] > r1[3] ||
-                    r2[3] < r1[1]);
           };
 
           // Get the layer extent defines in the GetCapabilities
@@ -308,6 +304,32 @@ goog.require('ga_urlutils_service');
           39.37 * 72;
     };
 
+    // Adjust layer extent center according to scale
+    var adjustLayerExtentCenter =
+    function(view, extent, mapSize, maxScaleDenominator) {
+      // We test if the layer extent specified in the
+      // getCapabilities fit the minScale value.
+      var layerExtentScale = getScaleFromExtent(view, extent, mapSize);
+      if (layerExtentScale > maxScaleDenominator) {
+        var layerExtentCenter = ol.extent.getCenter(extent);
+        var factor = layerExtentScale / maxScaleDenominator;
+        var width = ol.extent.getWidth(extent) / factor;
+        var height = ol.extent.getHeight(extent) / factor;
+        extent = [
+          layerExtentCenter[0] - width / 2,
+          layerExtentCenter[1] - height / 2,
+          layerExtentCenter[0] + width / 2,
+          layerExtentCenter[1] + height / 2
+        ];
+        var res = view.constrainResolution(
+          view.getResolutionForExtent(extent,
+          mapSize), 0, -1);
+        view.setCenter(layerExtentCenter);
+        view.setResolution(res);
+        return;
+      }
+    };
+
     // Zoom to layer extent
     var zoomToLayerExtent = function(layer, map) {
       var extent = layer.extent;
@@ -315,71 +337,46 @@ goog.require('ga_urlutils_service');
       var mapSize = map.getSize();
 
       var mapExtent = map.previousExtent_;
-      var x1 = mapExtent[0];
-      var y1 = mapExtent[1];
-      var x2 = mapExtent[2];
-      var y2 = mapExtent[3];
 
       var layerExtentCenter = ol.extent.getCenter(extent);
       var LCx = layerExtentCenter[0];
       var LCy = layerExtentCenter[1];
 
-      // If the center of the layer extent is out of the map-extent-dx or
-      // map-extent-dy, the map extent is set as extent for the layer zoom in
-      if ((LCx < x1) || (LCx > x2) || (LCy < y1) || (LCy > y2)) {
-        extent = mapExtent;
-        var mapExtentCenter = ol.extent.getCenter(extent);
+      // If the center of the layer extent is contained in the map extent
+      if (ol.extent.containsXY(mapExtent, LCx, LCy)) {
+        // True: center of layer-extent in map extent
         if (layer.MaxScaleDenominator && extent) {
-          // We test if the layer extent specified in the
-          // getCapabilities fit the minScale value.
-          var mapExtentScale = getScaleFromExtent(view, extent, mapSize);
-
-          if (mapExtentScale > layer.MaxScaleDenominator) {
-            var factor = mapExtentScale / layer.MaxScaleDenominator;
-            var width = ol.extent.getWidth(extent) / factor;
-            var height = ol.extent.getHeight(extent) / factor;
-            extent = [
-              mapExtentCenter[0] - width / 2,
-              mapExtentCenter[1] - height / 2,
-              mapExtentCenter[0] + width / 2,
-              mapExtentCenter[1] + height / 2
-            ];
-
-            var res = view.constrainResolution(
-                  view.getResolutionForExtent(extent, mapSize), 0, -1);
-            view.setCenter(mapExtentCenter);
-            view.setResolution(res);
-            return;
-          }
+          adjustLayerExtentCenter(view, extent, mapSize,
+              layer.MaxScaleDenominator);
         }
       } else {
-        // If a minScale is defined
-        if (layer.MaxScaleDenominator && extent) {
+        // False: center of layer extent not in map extent
 
-          // We test if the layer extent specified in the
-          // getCapabilities fit the minScale value.
-          var layerExtentScale = getScaleFromExtent(view, extent, mapSize);
-
-          if (layerExtentScale > layer.MaxScaleDenominator) {
-            var factor = layerExtentScale / layer.MaxScaleDenominator;
-            var width = ol.extent.getWidth(extent) / factor;
-            var height = ol.extent.getHeight(extent) / factor;
-            extent = [
-              layerExtentCenter[0] - width / 2,
-              layerExtentCenter[1] - height / 2,
-              layerExtentCenter[0] + width / 2,
-              layerExtentCenter[1] + height / 2
-            ];
-
-            var res = view.constrainResolution(
-                view.getResolutionForExtent(extent, mapSize), 0, -1);
-            view.setCenter(layerExtentCenter);
-            view.setResolution(res);
-            return;
+        // Check intersection between each layer extent and map extent
+        if ((!ol.extent.intersects(mapExtent, extent))) {
+          // False: no intersection between layer extent and map extent
+          layer.isInvalid = true;
+          layer.Abstract = 'sublayer_invalid_no intersection_with_map_extent';
+          extent = mapExtent;
+          layerExtentCenter = ol.extent.getCenter(extent);
+          var res = view.constrainResolution(
+              view.getResolutionForExtent(extent, mapSize), 0, -1);
+          view.setCenter(layerExtentCenter);
+          view.setResolution(res);
+          return;
+        } else {
+          // True: there is intersection between layer extent and map extent
+          window.console.log(layer);
+          extent = ol.extent.getIntersection(mapExtent, extent);
+          if (layer.MaxScaleDenominator && extent) {
+            adjustLayerExtentCenter(view, extent, mapSize,
+                layer.MaxScaleDenominator);
+          } else {
+            var scale = 100000000;
+            adjustLayerExtentCenter(view, extent, mapSize, scale);
           }
         }
       }
-
       if (extent) {
         view.fit(extent, mapSize);
       }
