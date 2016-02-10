@@ -190,19 +190,13 @@ goog.require('ga_urlutils_service');
 
             // if there is no intersection between the map-extent
             // and the WMS-layer-extent, the layer is set as invalid
-            if ((layer.Layer) && (layer.Layer !== undefined)) {
-              for (var i = 0; i < layer.Layer.length; i++) {
-                var l = getChildLayers(layer.Layer[i], map, wmsVersion);
-                if (l.extent) {
-                  var intersection =
-                    ol.extent.intersects(map.previousExtent_, l.extent);
-                }
-              }
-              if (!intersection) {
-                layer.isInvalid = true;
-                layer.Abstract =
-                  'layer_invalid_no_intersection_with_map_extent';
-              }
+            layer.extent = getLayerExtentFromGetCap(layer);
+            layer.extent = ol.extent.intersects(
+                map.getView().getProjection().getExtent(), layer.extent);
+            if (!layer.extent) {
+              layer.isInvalid = true;
+              layer.Abstract =
+                'layer_invalid_no_intersection_with_map_extent';
             }
 
             if (!layer.isInvalid) {
@@ -336,45 +330,28 @@ goog.require('ga_urlutils_service');
       var view = map.getView();
       var mapSize = map.getSize();
 
-      var mapExtent = map.previousExtent_;
+      var mapExtent = map.getView().getProjection().getExtent();
 
       var layerExtentCenter = ol.extent.getCenter(extent);
       var LCx = layerExtentCenter[0];
       var LCy = layerExtentCenter[1];
 
-      // If the center of the layer extent is contained in the map extent
+      // If the center of the sublayer extent is contained in the map extent
       if (ol.extent.containsXY(mapExtent, LCx, LCy)) {
-        // True: center of layer-extent in map extent
+        // True: center of sublayer extent in map extent
         if (layer.MaxScaleDenominator && extent) {
           adjustLayerExtentCenter(view, extent, mapSize,
               layer.MaxScaleDenominator);
         }
       } else {
-        // False: center of layer extent not in map extent
-
-        // Check intersection between each layer extent and map extent
-        if ((!ol.extent.intersects(mapExtent, extent))) {
-          // False: no intersection between layer extent and map extent
-          layer.isInvalid = true;
-          layer.Abstract = 'sublayer_invalid_no intersection_with_map_extent';
-          extent = mapExtent;
-          layerExtentCenter = ol.extent.getCenter(extent);
-          var res = view.constrainResolution(
-              view.getResolutionForExtent(extent, mapSize), 0, -1);
-          view.setCenter(layerExtentCenter);
-          view.setResolution(res);
-          return;
+        // False: check intersection between each sublayer extent and map extent
+        extent = ol.extent.getIntersection(mapExtent, extent);
+        if (layer.MaxScaleDenominator && extent) {
+          adjustLayerExtentCenter(view, extent, mapSize,
+              layer.MaxScaleDenominator);
         } else {
-          // True: there is intersection between layer extent and map extent
-          window.console.log(layer);
-          extent = ol.extent.getIntersection(mapExtent, extent);
-          if (layer.MaxScaleDenominator && extent) {
-            adjustLayerExtentCenter(view, extent, mapSize,
-                layer.MaxScaleDenominator);
-          } else {
-            var scale = 100000000;
-            adjustLayerExtentCenter(view, extent, mapSize, scale);
-          }
+          var scale = 100000000;
+          adjustLayerExtentCenter(view, extent, mapSize, scale);
         }
       }
       if (extent) {

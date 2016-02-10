@@ -15,8 +15,8 @@ goog.provide('ga_importwms_controller');
         'http://wms.ga.admin.ch/LG_DE_Geologie_und_Tektonik/wms',
         //Regular WMS
         'http://osm.omniscale.net/proxy/service',
-        'http://vmap0.tiles.osgeo.org/wms/vmap0',
-        'http://demo.mapserver.org/cgi-bin/wms',
+        //'http://vmap0.tiles.osgeo.org/wms/vmap0', parsing error
+        //'http://demo.mapserver.org/cgi-bin/wms', upload error
         //eurosoil
         'http://eusoils.jrc.ec.europa.eu/wrb/wms_Threats.asp',
         //eea
