@@ -65,8 +65,9 @@ goog.require('ga_map_service');
           if (winShop) {
             winShop.focus();
           }
-          winShop = $window.open(
-              'https://shop-shopbgdi.openshift.puzzle.ch/#/' + gaLang.get() +
+          //var shopUrl = 'https://shop-shopbgdi.openshift.puzzle.ch/#/';
+          var shopUrl = 'https://shop-bgdi.dev.bgdi.ch/';
+          winShop = $window.open(shopUrl + gaLang.get() +
               '/dispatcher?layers=' + layerBodId + '&' + layerBodId + '=' +
               scope.feature.id + '&target=' + winShopName, winShopName);
           scope.showConfirm = false;
