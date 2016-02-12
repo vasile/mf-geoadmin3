@@ -29,6 +29,7 @@ DEFAULT_TOPIC_ID ?= ech
 TRANSLATION_FALLBACK_CODE ?= de
 LANGUAGES ?= '[\"de\", \"en\", \"fr\", \"it\", \"rm\"]'
 LANGS ?= de fr it rm en
+HTMLFILES ?= index mobile embed
 TRANSLATE_GSPREAD_KEYS ?= 1F3R46w4PODfsbJq7jd79sapy3B7TXhQcYM7SEaccOA0
 TRANSLATE_CSV_FILES ?= "https://docs.google.com/spreadsheets/d/1F3R46w4PODfsbJq7jd79sapy3B7TXhQcYM7SEaccOA0/export?format=csv&gid=0"
 TRANSLATE_EMPTY_JSON ?= src/locales/empty.json
@@ -42,6 +43,7 @@ DEFAULT_EPSG ?= EPSG:21781
 DEFAULT_EPSG_EXTEND ?= '[420000, 30000, 900000, 350000]'
 DEFAULT_ELEVATION_MODEL ?= COMB
 DEFAULT_TERRAIN ?= ch.swisstopo.terrain.3d
+USER_NAME ?= $(shell id -un)
 
 ## Python interpreter can't have space in path name
 ## So prepend all python scripts with python cmd
@@ -154,6 +156,16 @@ deployint: guard-SNAPSHOT
 .PHONY: deployprod
 deployprod: guard-SNAPSHOT
 	./scripts/deploysnapshot.sh $(SNAPSHOT) prod
+
+.PHONY: deploys3
+deploys3:
+	for dir in img lib locales style; do aws s3 cp --recursive --acl public-read  --profile ltbon prd/${dir}  s3://dummy-geoadmin/$(VERSION)/${dir}; done
+	$(foreach lang, $(LANGS), aws s3 cp  --acl public-read  --profile ltbon prd/cache/layersConfig.$(lang).json  s3://dummy-geoadmin/$(VERSION)/;)
+	$(foreach file, $(HTMLFILES), aws s3 cp   --profile ltbon --acl public-read  prd/$(file).html  s3://dummy-geoadmin/$(file).$(VERSION).html;)
+	aws s3 cp  --acl public-read  --profile ltbon prd/cache/services  s3://dummy-geoadmin/$(VERSION)/services
+	aws s3 cp --recursive --acl public-read  --profile ltbon src   s3://dummy-geoadmin/$(VERSION)/src
+	aws s3 cp  --acl public-read  --profile ltbon prd/cache/services  s3://dummy-geoadmin/$(VERSION)/src/services
+	$(foreach lang, $(LANGS), aws s3 cp  --acl public-read  --profile ltbon prd/cache/layersConfig.$(lang).json  s3://dummy-geoadmin/$(VERSION)/src/;)
 
 .PHONY: deploybranch
 deploybranch: deploy/deploy-branch.cfg $(DEPLOY_ROOT_DIR)/$(GIT_BRANCH)/.git/config
@@ -317,7 +329,7 @@ prd/cache/: .build-artefacts/last-version \
 			.build-artefacts/last-api-url
 	mkdir -p $@
 	curl -q -o prd/cache/services http:$(API_URL)/rest/services
-	$(foreach lang, $(LANGS), curl -s --retry 3 -o prd/cache/layersConfig.$(lang) http:$(API_URL)/rest/services/all/MapServer/layersConfig?lang=$(lang);)
+	$(foreach lang, $(LANGS), curl -s --retry 3 -o prd/cache/layersConfig.$(lang).json http:$(API_URL)/rest/services/all/MapServer/layersConfig?lang=$(lang);)
 
 define buildpage
 	${PYTHON_CMD} ${MAKO_CMD} \
