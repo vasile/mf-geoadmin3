@@ -38,7 +38,12 @@ fi
 
 cd $cwd
 
-
+# Keep a reference to the last release and commit
+if [ -d .git ]; then
+  git describe --tags --abbrev=0 > .last-release
+  git log -1 --pretty=format:"%h - %an, %ar : %s" > .last-commit-ref
+fi
+rm -rf .git*
 
 sudo -u deploy deploy -r deploy/deploy.cfg $2 $SNAPSHOTDIR
 
