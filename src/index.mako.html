@@ -719,7 +719,7 @@ itemscope itemtype="http://schema.org/WebApplication"
 
         var module = angular.module('geoadmin');
         var cacheAdd = '${version}' != '' ? '/' + '${version}' : '';
-        var pathname = location.pathname.replace(/(index|mobile|embed)\.html$/g, '');
+        var pathname = location.pathname.replace(/(index|mobile|embed)\.[\.\d]*html$/g, '');
 
         module.constant('gaGlobalOptions', {
           //dev3d to be removed once 3d goes live
@@ -773,7 +773,7 @@ itemscope itemtype="http://schema.org/WebApplication"
           gaLayersProvider.wmtsGetTileUrlTemplate = '//wmts{s}.geo.admin.ch/1.0.0/{Layer}/default/{Time}/{TileMatrixSet}/{z}/{y}/{x}.{Format}';
           gaLayersProvider.wmtsMapProxyGetTileUrlTemplate =  gaGlobalOptions.mapproxyUrl + '/1.0.0/{Layer}/default/{Time}/{TileMatrixSet}/{z}/{x}/{y}.{Format}';
           gaLayersProvider.terrainTileUrlTemplate = '//3d.geo.admin.ch/1.0.0/{Layer}/default/{Time}/4326';
-          gaLayersProvider.layersConfigUrlTemplate = gaGlobalOptions.resourceUrl + 'layersConfig?lang={Lang}';
+          gaLayersProvider.layersConfigUrlTemplate = gaGlobalOptions.resourceUrl + 'layersConfig.{Lang}.json';
           gaLayersProvider.legendUrlTemplate = gaGlobalOptions.apiUrl + '/rest/services/all/MapServer/{Layer}/legend?lang={Lang}';
         });
         module.config(function(gaTopicProvider, gaGlobalOptions) {
