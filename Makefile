@@ -100,7 +100,7 @@ all: lint dev prod apache testdev testprod deploy/deploy-branch.cfg fixrights
 prod: prd/lib/ \
 	prd/lib/build.js \
 	prd/style/app.css \
-	prd/geoadmin.appcache \
+	prd/geoadmin2.appcache \
 	prd/index.html \
 	prd/mobile.html \
 	prd/embed.html \
@@ -133,7 +133,7 @@ teste2e: guard-BROWSERSTACK_TARGETURL guard-BROWSERSTACK_USER guard-BROWSERSTACK
 apache: apache/app.conf
 
 .PHONY: appcache
-appcache: cleanappcache prd/geoadmin.appcache prd/index.html prd/mobile.html prd/embed.html
+appcache: cleanappcache prd/geoadmin2.appcache prd/index.html prd/mobile.html prd/embed.html
 
 .PHONY: deploydev
 deploydev:
@@ -301,7 +301,7 @@ prd/style/app.css: $(SRC_LESS_FILES)
 	mkdir -p $(dir $@)
 	node_modules/.bin/lessc $(LESS_PARAMETERS) --clean-css src/style/app.less $@
 
-prd/geoadmin.appcache: src/geoadmin.mako.appcache \
+prd/geoadmin2.appcache: src/geoadmin.mako.appcache \
 			${MAKO_CMD} \
 			.build-artefacts/last-version
 	mkdir -p $(dir $@);
@@ -615,6 +615,7 @@ cleanall: clean
 .PHONY: cleanappcache
 cleanappcache:
 	rm -f prd/geoadmin.appcache
+	rm -f prd/geoadmin2.appcache
 	rm -f prd/index.html
 	rm -f prd/mobile.html
 	rm -f prd/embed.html
