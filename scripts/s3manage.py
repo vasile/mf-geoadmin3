@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-
-
+# -*- coding: utf-8 -*-
 
 import re
 import boto
@@ -55,7 +54,7 @@ def _unzip_data(compressed):
 
 
 def save_to_s3(src, dest, cached=True, mimetype=None):
-    
+
     with open(src, 'r') as f:
         data = f.read()
     if mimetype is None:
@@ -65,31 +64,28 @@ def save_to_s3(src, dest, cached=True, mimetype=None):
 
 
 def _save_to_s3(in_data, dest, mimetype, compress=True, cached=True):
-    
+
     data = in_data
     compressed = False
     content_encoding = None
-    cache_control =  'max-age=31536000, public'
+    cache_control = 'max-age=31536000, public'
 
     if compress and mimetype not in NO_COMPRESS:
 
         data = _gzip_data(in_data)
         content_encoding = 'gzip'
         compressed = True
-        
 
-    print "Uploading {} - {}, compressed: {}, cached: {}".format(dest, mimetype, compressed, cached)
+    print "Uploading {} - {}, gzip: {}, cache headers: {}".format(dest, mimetype, compressed, cached)
     if cached is False:
         cache_control = 'no-cache, no-store, max-age=0, must-revalidate'
 
-    
-    
     try:
         k = boto.s3.key.Key(bucket=bucket)
         k.key = dest
         k.set_metadata('Content-Type', mimetype)
         k.content_type = mimetype
-        k.set_metadata('Cache-Control',cache_control)
+        k.set_metadata('Cache-Control', cache_control)
         k.cache_control = cache_control
         k.content_type = mimetype
         k.size = len(data)
@@ -102,14 +98,13 @@ def _save_to_s3(in_data, dest, mimetype, compress=True, cached=True):
             k.content_encoding = None
         k.set_contents_from_string(data, replace=True, policy='public-read')
     except Exception as e:
-        print "Error while uploading {}: {}".format(dest,e)
+        print "Error while uploading {}: {}".format(dest, e)
 
 
 def get_index_version(c):
     version = None
     p = re.compile(ur'version: \'(\d+)\'')
     match = re.findall(p, c)
-    print match
     if len(match) > 0:
         version = int(match[0])
 
@@ -123,10 +118,9 @@ bucket = s3.get_bucket(BUCKET_NAME)
 headers = {}
 
 
-
 def usage():
     print "\nManage map.geo.admin.ch versions in AWS S3 bucket\n"
-    print 'Usage: '+ os.path.basename(sys.argv[0]) + ' <command> [option]'
+    print 'Usage: ' + os.path.basename(sys.argv[0]) + ' <command> [option]'
     print
     print "Commands:"
     print
@@ -142,19 +136,17 @@ def usage():
 
 
 def upload(version, base_dir):
-    FILES = ['prd/lib/build.js', 
-             'prd/style/app.css', 
-             'prd/index.html', 
-             'prd/lib/build.js', 
-             'prd/img', 
+    FILES = ['prd/lib/build.js',
+             'prd/style/app.css',
+             'prd/index.html',
+             'prd/lib/build.js',
+             'prd/img',
              'prd/style',
-             'prd/lib', 
+             'prd/lib',
              'prd/locales'
              ]
-    
+
     VERSION = str(version)
-    
-   
 
     for fname in FILES:
         fullpath = os.path.join(base_dir, fname)
@@ -166,24 +158,24 @@ def upload(version, base_dir):
             for (root, dirs, files) in os.walk(fullpath):
                 for fn in files:
                     path = os.path.join(root, fn)
-                    relpath = os.path.relpath(path, os.path.commonprefix([base_dir, path])) 
+                    relpath = os.path.relpath(path, os.path.commonprefix([base_dir, path]))
                     dest = relpath.replace('prd', VERSION)
                     save_to_s3(path, dest, cached=True)
 
     for n in ('index', 'embed', 'mobile'):
         save_to_s3('prd/{}.html'.format(n), '{}.{}.html'.format(n, VERSION), cached=False)
-        
+
     save_to_s3('prd/cache/services', '{}/services'.format(VERSION), cached=True, mimetype='application/js')
 
     for lang in ('de', 'fr', 'it', 'rm', 'en'):
         save_to_s3('prd/cache/layersConfig.{}.json'.format(lang), '{}/layersConfig.{}.json'.format(VERSION, lang), cached=True, mimetype='application/js')
 
-      
     save_to_s3('prd/geoadmin.appcache', '{}/geoadmin.appcache'.format(VERSION), cached=False, mimetype='text/cache-manifest')
     save_to_s3('prd/robots.txt', '{}/robots.txt'.format(VERSION), cached=False, mimetype='text/plain')
     save_to_s3('prd/checker', '{}/checker'.format(VERSION), cached=False, mimetype='text/plain')
-    
-    print("Please check it on '{}'".format(get_url("index.{}.html".format(VERSION))))
+
+    print "Upload finished"
+    print("\n\nPlease check it on '{}'\n".format(get_url("index.{}.html".format(VERSION))))
 
 
 def get_active_version():
@@ -192,18 +184,17 @@ def get_active_version():
     try:
         c = k.get_contents_as_string()
         d = _unzip_data(c)
-    except boto.exception.S3ResponseError as e:
+    except boto.exception.S3ResponseError:
         return 0
 
     return int(get_index_version(d))
 
+
 def version_exists(version):
     files = bucket.list(prefix=str(version))
-    
+
     return len(list(files)) > 0
-    
-    
-    
+
 
 def list_version():
     active_version = int(get_active_version())
@@ -215,42 +206,41 @@ def list_version():
         match = re.search(p, index.name)
         if match:
             version = int(match.groups()[0])
-            print version, index.last_modified, version == active_version
+            print version, index.last_modified, 'active' if version == active_version else ''
+
 
 def delete_version(version):
     if version_exists(version) is False:
-        print("Version '{}' does not exists in AWS S3. Aborting".format(version))        
+        print("Version '{}' does not exists in AWS S3. Aborting".format(version))
         sys.exit(2)
-        
+
     if version == get_active_version():
         print("Version '{}' is the active version. You cannot delete it".format(version))
         sys.exit()
-        
-   
+
     result_set = bucket.list(prefix=str(version))
-    
+
     indexes = [k.name for k in list(result_set)]
     for n in ('index', 'embed', 'mobile'):
         k = boto.s3.key.Key(bucket)
         src_key_name = '{}.{}.html'.format(n, version)
         indexes.append(src_key_name)
-        
+
     result_set = bucket.delete_keys(indexes)
-        
+
     for v in result_set.deleted:
         print v
-        
-        
+
 
 def activate(version):
     if version_exists(version) is False:
-        print("Version '{}' does not exists in AWS S3. Aborting".format(version))        
+        print("Version '{}' does not exists in AWS S3. Aborting".format(version))
         sys.exit(2)
-        
+
     if version == get_active_version():
         print("Version '{}' is already the active version. Doing nothing".format(version))
         sys.exit()
-        
+
     for n in ('index', 'embed', 'mobile'):
         k = boto.s3.key.Key(bucket)
         src_key_name = '{}.{}.html'.format(n, version)
@@ -259,10 +249,9 @@ def activate(version):
 
         bucket.copy_key(n + '.html', bucket.name, src_key_name, preserve_acl=True)
     for j in ('robots.txt', 'geoadmin.appcache', 'checker'):
-        src_key_name = '{}/{}'.format( version, j)
+        src_key_name = '{}/{}'.format(version, j)
         bucket.copy_key(os.path.basename(src_key_name), bucket.name, src_key_name, preserve_acl=True)
-        
-        
+
     print("Please check it on '{}'".format(get_url()))
 
 
@@ -271,7 +260,7 @@ def get_url(key_name='index.html'):
         host=s3.server_name(),
         bucket=bucket.name,
         key=key_name)
-    
+
     return http_url
 
 
@@ -282,19 +271,19 @@ def main():
         sys.exit()
 
     if str(sys.argv[1]) == 'upload':
-        
+
         if len(sys.argv) == 3:
             base_dir = os.path.abspath(sys.argv[2])
         else:
             base_dir = os.getcwd()
-    
+
         with open(os.path.join(base_dir, 'prd/index.html'), 'r') as f:
             ctx = f.read()
-    
+
         VERSION = get_index_version(ctx)
-        
+
         active_version = get_active_version()
-        
+
         if VERSION == active_version:
             response = raw_input("WARNING!!!\nVersion {} is the active one!!!\nDo you really want to upload it from '{}'?: [y/N]".format(VERSION, base_dir))
         else:
@@ -302,16 +291,15 @@ def main():
                 response = raw_input("Do you want to upload version '{}' from '{}'?: [y/N]".format(VERSION, base_dir))
             else:
                 response = raw_input("Version '{}' already exists in AWS S3. Do you really want to overwrite it with files from '{}'?: [y/N]".format(VERSION, base_dir))
-    
+
         if response != 'y':
             print "Aborting"
             sys.exit()
         upload(VERSION, base_dir)
-    
+
     if str(sys.argv[1]) == 'list':
         list_version()
-    
-    
+
     if str(sys.argv[1]) == 'activate' and len(sys.argv) == 3:
         version = int(sys.argv[2])
         print("Trying to activate version '{}'".format(version))
@@ -320,13 +308,7 @@ def main():
     if str(sys.argv[1]) == 'delete' and len(sys.argv) == 3:
         version = int(sys.argv[2])
         print("Trying to delete version '{}'".format(version))
-        delete_version(version)   
+        delete_version(version)
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
