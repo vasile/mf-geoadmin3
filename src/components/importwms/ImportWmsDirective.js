@@ -191,7 +191,8 @@ goog.require('ga_urlutils_service');
             // if there is no intersection between the map-extent
             // and the WMS-layer-extent, the layer is set as invalid
             layer.extent = getLayerExtentFromGetCap(layer);
-            if (!ol.extent.intersects(map.getView().getProjection().getExtent(), layer.extent)) {
+            if (!ol.extent.intersects
+                (map.getView().getProjection().getExtent(), layer.extent)) {
               layer.isInvalid = true;
               layer.Abstract =
                 'layer_invalid_no_intersection_with_map_extent';
@@ -341,7 +342,6 @@ goog.require('ga_urlutils_service');
       }
       adjustLayerExtentCenter(view, extent, mapSize,
             layer.MaxScaleDenominator || 100000000);
-      
       if (extent) {
         view.fit(extent, mapSize);
       }
