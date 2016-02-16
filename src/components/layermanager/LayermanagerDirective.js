@@ -280,7 +280,7 @@ goog.require('ga_urlutils_service');
           scope.map.getLayers().forEach(function(olLayer) {
             if (scope.isBodLayer(olLayer)) {
               var l = gaLayers.getLayer(olLayer.bodId);
-              var regex = new RegExp('(^|,)(ech|' + topicId + ')(,|$)', 'g');
+              var regex = new RegExp('(^|,)(' + topicId + ')(,|$)', 'g');
               if (l &&
                   l.topics &&
                   !regex.test(l.topics) &&
